@@ -1,0 +1,3 @@
+--- USERS IN DATABASE ---
+Name: Sharon, Email: rdxsharon10@gmail.com
+--- END USERS ---
