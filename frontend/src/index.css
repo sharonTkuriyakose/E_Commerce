@@ -23,14 +23,26 @@
 
 /* Custom base styles */
 @layer base {
+  html, body {
+    @apply min-h-screen transition-colors duration-500;
+  }
+
   body {
     @apply bg-bg-light text-text-main antialiased overflow-x-hidden;
     font-family: 'Inter', sans-serif;
   }
   
+  .dark body {
+    @apply bg-slate-950 text-white;
+  }
+  
   h1, h2, h3, h4, h5, h6 {
     @apply text-primary font-bold;
     font-family: 'Inter', sans-serif;
+  }
+
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    @apply text-white;
   }
 }
 
@@ -55,10 +67,11 @@
   }
 
   .btn-outline {
-    @apply px-10 py-3 rounded-md border border-border bg-white text-primary font-bold text-sm transition-all duration-200 uppercase tracking-wider flex items-center justify-center gap-2;
+    @apply px-10 py-3 rounded-md border border-border bg-transparent font-bold text-sm transition-all duration-200 uppercase tracking-wider flex items-center justify-center gap-2;
+    @apply text-primary dark:text-white;
   }
   .btn-outline:hover {
-    @apply border-primary bg-slate-50;
+    @apply border-primary bg-slate-50 dark:bg-slate-900 dark:border-white;
   }
 
   .btn-ghost {

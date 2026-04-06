@@ -14,7 +14,7 @@ const Products = () => {
   
   const [allProducts, setAllProducts] = useState([]);
   const [activeCategory, setActiveCategory] = useState(categoryParam || 'all');
-  const [priceRange, setPriceRange] = useState(5000);
+  const [priceRange, setPriceRange] = useState(500000);
   const [searchQuery, setSearchQuery] = useState(searchParam || '');
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -74,7 +74,7 @@ const Products = () => {
 
             {/* Categories */}
             <div className="pt-4">
-              <p className={`text-[10px] font-black uppercase tracking-[0.3em] mb-5 ${darkMode ? 'text-slate-500' : 'text-primary'}`}>Categories</p>
+              <p className={`text-[10px] font-black uppercase tracking-[0.3em] mb-5 transition-colors ${darkMode ? 'text-slate-400' : 'text-primary'}`}>Categories</p>
               <div className="space-y-3">
                 <button 
                   onClick={() => setActiveCategory('all')}
@@ -91,7 +91,7 @@ const Products = () => {
                     onClick={() => setActiveCategory(cat.id)}
                     className="flex items-center gap-3 w-full group"
                   >
-                    <div className={`w-4 h-4 border-2 rounded-sm flex items-center justify-center transition-all ${activeCategory === cat.id ? 'border-accent bg-accent' : (darkMode ? 'border-slate-800' : 'border-border')}`}>
+                    <div className={`w-4 h-4 border-2 rounded-sm flex items-center justify-center transition-all ${activeCategory === cat.id ? 'border-accent bg-accent' : (darkMode ? 'border-slate-700' : 'border-border')}`}>
                       {activeCategory === cat.id && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
                     </div>
                     <span className={`text-[11px] font-black uppercase tracking-widest transition-colors ${activeCategory === cat.id ? 'text-accent' : (darkMode ? 'text-slate-400 group-hover:text-white' : 'text-text-secondary group-hover:text-primary')}`}>{cat.name}</span>
@@ -104,14 +104,14 @@ const Products = () => {
               <p className={`text-[10px] font-black uppercase tracking-[0.3em] mb-5 ${darkMode ? 'text-slate-500' : 'text-primary'}`}>Price Range</p>
               <div className="px-1 space-y-4">
                 <input 
-                   type="range" min="0" max="5000" step="100" 
+                   type="range" min="0" max="500000" step="1000" 
                    value={priceRange} 
                    onChange={(e) => setPriceRange(Number(e.target.value))}
                    className="w-full accent-accent h-1 bg-border dark:bg-slate-800 rounded-lg appearance-none cursor-pointer"
                 />
                 <div className={`flex justify-between items-center px-4 py-2 rounded-sm border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-bg-alt border-border/5'}`}>
                    <span className="text-[10px] font-black text-text-muted">₹0</span>
-                   <span className={`text-sm font-black tracking-tighter ${darkMode ? 'text-white' : 'text-primary'}`}>₹{priceRange.toLocaleString()}</span>
+                   <span className={`text-sm font-black tracking-tighter ${darkMode ? 'text-white' : 'text-primary'}`}>₹{priceRange.toLocaleString()}+</span>
                 </div>
               </div>
             </div>
@@ -121,15 +121,15 @@ const Products = () => {
               <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 no-scrollbar">
                 {['Sony', 'Bose', 'Apple', 'Sennheiser', 'Samsung', 'Beats', 'LG'].map(brand => (
                   <div key={brand} className="flex items-center gap-3 group cursor-pointer">
-                    <div className={`w-4 h-4 border-2 rounded-sm transition-all group-hover:border-accent ${darkMode ? 'border-slate-800' : 'border-border'}`}></div>
-                    <span className={`text-[11px] font-black uppercase tracking-widest transition-colors ${darkMode ? 'text-slate-400 group-hover:text-white' : 'text-text-secondary group-hover:text-primary'}`}>{brand}</span>
+                    <div className={`w-4 h-4 border-2 rounded-sm transition-all group-hover:border-accent ${darkMode ? 'border-slate-700' : 'border-border'}`}></div>
+                    <span className={`text-[13px] font-black uppercase tracking-[0.3em] transition-all ${darkMode ? 'text-slate-300 group-hover:text-accent' : 'text-text-muted group-hover:text-primary'}`}>{brand}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             <button 
-              onClick={() => { setActiveCategory('all'); setPriceRange(5000); setSearchQuery(''); setSortBy('latest'); }}
+              onClick={() => { setActiveCategory('all'); setPriceRange(500000); setSearchQuery(''); setSortBy('latest'); }}
               className={`w-full py-3 mt-6 border text-[10px] font-black uppercase tracking-[0.2em] transition-all ${darkMode ? 'border-slate-800 text-slate-400 hover:bg-slate-900' : 'border-border text-primary hover:bg-slate-50'}`}
             >
               Clear All Filters
@@ -141,23 +141,23 @@ const Products = () => {
             {/* Toolbar */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-border gap-4">
               <div className="flex items-center gap-3">
-                 <h3 className="text-lg font-black text-primary uppercase tracking-tighter">Results</h3>
-                 <span className="text-xs text-text-muted font-medium italic">({filteredProducts.length} items found)</span>
+                 <h3 className={`text-lg font-black uppercase tracking-tighter ${darkMode ? 'text-white' : 'text-primary'}`}>Results</h3>
+                 <span className={`text-xs font-medium italic ${darkMode ? 'text-slate-500' : 'text-text-muted'}`}>({filteredProducts.length} items found)</span>
               </div>
               
-              <div className="flex items-center gap-3 border border-border px-4 py-2 hover:bg-slate-50 cursor-pointer">
-                <span className="text-[10px] font-bold uppercase text-text-secondary">Sort by:</span>
+              <div className={`flex items-center gap-3 border px-4 py-2 cursor-pointer transition-colors ${darkMode ? 'border-slate-800 hover:bg-slate-900 text-white' : 'border-border hover:bg-slate-50 text-primary'}`}>
+                <span className={`text-[10px] font-bold uppercase ${darkMode ? 'text-slate-400' : 'text-text-secondary'}`}>Sort by:</span>
                 <select 
                   value={sortBy} 
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-transparent border-0 text-[10px] font-black uppercase tracking-widest text-primary focus:outline-none appearance-none cursor-pointer pr-4"
+                  className={`bg-transparent border-0 text-[10px] font-black uppercase tracking-widest focus:outline-none appearance-none cursor-pointer pr-4 ${darkMode ? 'text-white bg-slate-900' : 'text-primary bg-white'}`}
                 >
-                  <option value="latest">What's New</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="rating">Customer Rating</option>
+                  <option value="latest" className={darkMode ? 'bg-slate-900 text-white' : 'bg-white text-primary'}>What's New</option>
+                  <option value="price-low" className={darkMode ? 'bg-slate-900 text-white' : 'bg-white text-primary'}>Price: Low to High</option>
+                  <option value="price-high" className={darkMode ? 'bg-slate-900 text-white' : 'bg-white text-primary'}>Price: High to Low</option>
+                  <option value="rating" className={darkMode ? 'bg-slate-900 text-white' : 'bg-white text-primary'}>Customer Rating</option>
                 </select>
-                <ChevronDown size={14} className="text-text-muted" />
+                <ChevronDown size={14} className={darkMode ? 'text-slate-500' : 'text-text-muted'} />
               </div>
             </div>
 
@@ -189,10 +189,10 @@ const Products = () => {
                     <div className="w-20 h-20 bg-slate-50 border border-border rounded-full flex items-center justify-center mb-8">
                        <Search size={32} className="text-text-muted" />
                     </div>
-                    <h3 className="text-2xl font-black text-primary uppercase tracking-tighter mb-4">No results for your search</h3>
-                    <p className="text-text-muted text-sm max-w-sm mb-10 leading-relaxed">Check for any spelling mistakes or try using more general terms.</p>
+                    <h3 className={`text-2xl font-black uppercase tracking-tighter mb-4 ${darkMode ? 'text-white' : 'text-primary'}`}>No results for your search</h3>
+                    <p className={`text-sm max-w-sm mb-10 leading-relaxed ${darkMode ? 'text-slate-400' : 'text-text-muted'}`}>Check for any spelling mistakes or try using more general terms.</p>
                     <button 
-                      onClick={() => {setActiveCategory('all'); setPriceRange(5000); setSearchQuery('');}} 
+                      onClick={() => {setActiveCategory('all'); setPriceRange(500000); setSearchQuery('');}} 
                       className="btn-primary !px-12 !py-4 text-[11px] font-black tracking-widest"
                     >
                       Clear Filters

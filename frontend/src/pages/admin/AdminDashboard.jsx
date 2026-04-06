@@ -5,11 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, BarElement } from 'chart.js';
 import { Line, Doughnut, Bar } from 'react-chartjs-2';
+import { useTheme } from '../../context/ThemeContext';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, BarElement);
 
 const AdminDashboard = () => {
   const { userInfo } = useAuth();
+  const { darkMode } = useTheme();
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
@@ -81,7 +83,7 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-32 flex flex-col items-center justify-center bg-white space-y-6">
+      <div className={`min-h-screen pt-32 flex flex-col items-center justify-center space-y-6 ${darkMode ? 'bg-slate-950 text-white' : 'bg-white'}`}>
         <div className="w-16 h-16 rounded-full border-4 border-slate-100 border-t-primary animate-spin"></div>
         <p className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">Synchronizing Logs...</p>
       </div>
@@ -89,22 +91,22 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="pt-32 min-h-screen bg-white selection:bg-primary/10 overflow-x-hidden">
+    <div className={`pt-32 min-h-screen selection:bg-primary/10 overflow-x-hidden transition-colors duration-500 ${darkMode ? 'bg-slate-950 text-white' : 'bg-white text-primary'}`}>
       <div className="container mx-auto px-6 pb-24 max-w-7xl">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16 border-b border-slate-100 pb-16">
+        <div className={`flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16 border-b pb-16 ${darkMode ? 'border-slate-800' : 'border-slate-100'}`}>
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
              <p className="text-[11px] font-black text-rose-500 uppercase tracking-[0.5em] mb-4">Management Intelligence</p>
-             <h1 className="text-4xl md:text-7xl font-black text-primary tracking-tighter uppercase leading-none">
+             <h1 className={`text-4xl md:text-7xl font-black tracking-tighter uppercase leading-none transition-colors ${darkMode ? 'text-white' : 'text-primary'}`}>
                 Admin <span className="text-slate-300">Dashboard</span>
              </h1>
-             <p className="text-slate-400 mt-6 text-lg font-medium">Verified Session: {userInfo.name} // Global Administrator Protocol Active.</p>
+             <p className={`mt-6 text-lg font-medium transition-colors ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Verified Session: {userInfo.name} // Global Administrator Protocol Active.</p>
           </motion.div>
           
           <div className="flex items-center gap-4">
-             <div className="bg-slate-50 border border-slate-200 px-6 py-3 rounded-md flex items-center gap-3 text-nowrap">
+             <div className={`border border-border px-6 py-3 rounded-md flex items-center gap-3 text-nowrap transition-colors ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50'}`}>
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span className="text-[10px] font-black text-primary uppercase tracking-widest">System Active</span>
+                <span className={`text-[10px] font-black uppercase tracking-widest transition-colors ${darkMode ? 'text-white' : 'text-primary'}`}>System Active</span>
              </div>
              <Link to="/admin/products/new" className="btn-primary py-4! px-8! rounded-md! text-[11px]! tracking-[0.2em]! font-black">
                 <Zap size={16} /> NEW ASSET +
@@ -121,17 +123,17 @@ const AdminDashboard = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
               onClick={() => navigate(stat.link)}
-              className="bg-slate-50 p-8 border border-slate-200 rounded-sm group hover:border-primary transition-all duration-300 cursor-pointer hover:shadow-lg"
+              className={`p-8 border border-border rounded-sm group hover:border-primary transition-all duration-300 cursor-pointer hover:shadow-lg ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50'}`}
             >
                <div className="flex items-center justify-between mb-8">
-                  <div className={`w-14 h-14 rounded-md ${stat.bg} flex items-center justify-center ${stat.color} group-hover:bg-primary group-hover:text-white transition-colors`}>
+                  <div className={`w-14 h-14 rounded-md flex items-center justify-center transition-colors ${darkMode ? 'bg-slate-800 text-white' : stat.bg + ' ' + stat.color} group-hover:bg-primary group-hover:text-white`}>
                     <stat.icon size={26} strokeWidth={2.5} />
                   </div>
                   <TrendingUp size={20} className="text-slate-300" />
                </div>
                <div className="space-y-1">
                   <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">{stat.title}</h3>
-                  <div className="text-4xl font-black text-primary tracking-tighter">{stat.value}</div>
+                  <div className={`text-4xl font-black tracking-tighter ${darkMode ? 'text-white' : 'text-primary'}`}>{stat.value}</div>
                </div>
             </motion.div>
           ))}
@@ -139,18 +141,18 @@ const AdminDashboard = () => {
 
         {/* ADVANCED ANALYTICS MATRIX */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-16">
-           <div className="lg:col-span-8 bg-slate-50 border border-slate-200 p-10 rounded-sm">
+           <div className={`lg:col-span-8 border border-border p-10 rounded-sm ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50'}`}>
               <div className="flex items-center justify-between mb-10">
-                 <h2 className="text-xs font-black uppercase tracking-[0.4em] text-primary">Tactical Revenue Stream</h2>
+                 <h2 className={`text-xs font-black uppercase tracking-[0.4em] ${darkMode ? 'text-white' : 'text-primary'}`}>Tactical Revenue Stream</h2>
                  <BarChart3 size={18} className="text-rose-500" />
               </div>
               <div className="h-[300px]">
                  <Line data={lineData} options={{ maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }} />
               </div>
            </div>
-           <div className="lg:col-span-4 bg-slate-50 border border-slate-200 p-10 rounded-sm flex flex-col">
+           <div className={`lg:col-span-4 border border-border p-10 rounded-sm flex flex-col ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50'}`}>
               <div className="flex items-center justify-between mb-10">
-                 <h2 className="text-xs font-black uppercase tracking-[0.4em] text-primary">Sector Distribution</h2>
+                 <h2 className={`text-xs font-black uppercase tracking-[0.4em] ${darkMode ? 'text-white' : 'text-primary'}`}>Sector Distribution</h2>
                  <PieChart size={18} className="text-rose-500" />
               </div>
               <div className="h-[250px] flex items-center justify-center">
@@ -161,9 +163,9 @@ const AdminDashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
           {/* Recent Acquisitions Table */}
-          <div className="lg:col-span-2 space-y-10">
-             <div className="flex items-center justify-between border-b border-slate-100 pb-6">
-                <h2 className="text-2xl sm:text-3xl font-black text-primary uppercase tracking-tighter">Acquisition <span className="text-rose-500">Logs</span></h2>
+           <div className="lg:col-span-2 space-y-10">
+              <div className={`flex items-center justify-between border-b pb-6 transition-colors ${darkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+                 <h2 className={`text-2xl sm:text-3xl font-black uppercase tracking-tighter transition-colors ${darkMode ? 'text-white' : 'text-primary'}`}>Acquisition <span className="text-rose-500">Logs</span></h2>
                 <Link to="/admin/orders" className="text-[10px] font-black text-slate-400 hover:text-primary transition-colors uppercase tracking-[0.3em]">View Global Archive</Link>
              </div>
 
@@ -171,7 +173,7 @@ const AdminDashboard = () => {
                 {recentOrders.map((order) => (
                   <motion.div
                     key={order._id}
-                    className="bg-white border border-slate-100 hover:border-primary p-8 transition-all group flex flex-col md:flex-row items-center gap-8 cursor-pointer relative"
+                    className={`border border-border hover:border-primary p-8 transition-all group flex flex-col md:flex-row items-center gap-8 cursor-pointer relative ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white'}`}
                     onClick={() => navigate(`/admin/orders/${order._id}`)}
                   >
                      <div className="shrink-0 flex flex-col items-center">
@@ -187,15 +189,15 @@ const AdminDashboard = () => {
                         </div>
                         <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                            {order.orderItems.map((item, idx) => (
-                             <div key={idx} className="bg-slate-50 border border-slate-200 px-3 py-1.5 flex items-center gap-2 rounded-sm">
-                                <span className="text-[10px] font-black text-primary uppercase truncate max-w-[150px]">{item.name}</span>
+                             <div key={idx} className={`border border-border px-3 py-1.5 flex items-center gap-2 rounded-sm ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50'}`}>
+                                <span className={`text-[10px] font-black uppercase truncate max-w-[150px] ${darkMode ? 'text-slate-300' : 'text-primary'}`}>{item.name}</span>
                                 <span className="text-[9px] font-bold text-rose-500">x{item.quantity}</span>
                              </div>
                            ))}
                         </div>
                      </div>
                      <div className="shrink-0 flex flex-col items-center md:items-end gap-3 text-right">
-                        <div className="text-2xl font-black text-primary tracking-tighter">₹{order.totalPrice.toLocaleString()}</div>
+                        <div className={`text-2xl font-black tracking-tighter ${darkMode ? 'text-white' : 'text-primary'}`}>₹{order.totalPrice.toLocaleString()}</div>
                         <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${order.isDelivered ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100 animate-pulse'}`}>
                            {order.isDelivered ? 'COMPLETED' : 'IN PROCESSING'}
                         </div>
@@ -208,7 +210,7 @@ const AdminDashboard = () => {
           <div className="space-y-12">
              {/* CRITICAL INVENTORY MONITOR - Advanced Feature */}
              <div className="space-y-8">
-                <h2 className="text-2xl sm:text-3xl font-black text-primary uppercase tracking-tighter pb-6 border-b border-slate-100 font-bold">Asset <span className="text-slate-300 font-bold">Alerts</span></h2>
+                <h2 className={`text-2xl sm:text-3xl font-black uppercase tracking-tighter pb-6 border-b border-border font-bold ${darkMode ? 'text-white' : 'text-primary'}`}>Asset <span className="text-slate-300 font-bold">Alerts</span></h2>
                 <div className="bg-slate-900 p-8 rounded-sm text-white space-y-8 shadow-2xl">
                    <div className="flex items-center justify-between">
                        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-rose-500">Inventory Criticality</h3>

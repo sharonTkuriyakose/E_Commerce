@@ -7,11 +7,13 @@ import { OrbitControls, Environment, Float, useTexture, Plane, ContactShadows } 
 import { ShieldCheck, Truck, RotateCcw, Star, ShoppingBag, Heart, ChevronRight, Loader2, ArrowRight, Zap, Info, Minus, Plus, Bookmark, Share2, Package, Send, History } from 'lucide-react';
 import * as THREE from 'three';
 import ProductCard3D from '../components/ProductCard3D';
+import { useTheme } from '../context/ThemeContext';
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { darkMode } = useTheme();
   
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -84,14 +86,14 @@ const ProductDetails = () => {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white gap-4">
+    <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${darkMode ? 'bg-slate-950 text-white' : 'bg-white'}`}>
       <Loader2 className="w-12 h-12 text-accent animate-spin" />
       <p className="text-xs font-black uppercase tracking-widest text-text-muted">Syncing catalog...</p>
     </div>
   );
 
   if (error || !product) return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6 text-center">
+    <div className={`min-h-screen flex flex-col items-center justify-center p-6 text-center ${darkMode ? 'bg-slate-950 text-white' : 'bg-white'}`}>
       <Info size={48} className="text-danger mb-6 opacity-20" />
       <h2 className="text-3xl font-black uppercase tracking-tighter mb-4 italic text-primary">Item Missing</h2>
       <Link to="/products" className="btn-primary !px-12 !py-4">Back To Store</Link>
@@ -99,28 +101,28 @@ const ProductDetails = () => {
   );
 
   return (
-    <div className="pt-32 min-h-screen bg-white">
+    <div className={`pt-32 min-h-screen transition-colors duration-500 ${darkMode ? 'bg-slate-950 text-white' : 'bg-white text-primary'}`}>
       <div className="container mx-auto px-6 mb-12">
-        <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-text-muted">
-          <Link to="/" className="text-primary hover:text-accent">Home</Link>
+        <div className={`flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] ${darkMode ? 'text-slate-500' : 'text-text-muted'}`}>
+          <Link to="/" className={`hover:text-accent ${darkMode ? 'text-slate-300' : 'text-primary'}`}>Home</Link>
           <ChevronRight size={14} />
-          <Link to="/products" className="text-primary hover:text-accent font-black">Electronic Ecosystem</Link>
+          <Link to="/products" className={`hover:text-accent font-black ${darkMode ? 'text-slate-300' : 'text-primary'}`}>Electronic Ecosystem</Link>
           <ChevronRight size={14} />
           <span className="text-accent">{product.name}</span>
         </div>
       </div>
 
       <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-20 items-start pb-24">
-        <div className="lg:col-span-7 aspect-square bg-slate-50 border border-border rounded-lg relative overflow-hidden flex items-center justify-center p-16">
+        <div className={`lg:col-span-7 aspect-square border border-border rounded-lg relative overflow-hidden flex items-center justify-center p-16 ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50'}`}>
            <motion.img 
              layoutId={`img-${product._id}`}
              src={product.image} 
              alt={product.name} 
-             className="w-full h-full object-contain mix-blend-multiply drop-shadow-2xl" 
+             className={`w-full h-full object-contain drop-shadow-2xl ${darkMode ? 'mix-blend-lighten' : 'mix-blend-multiply'}`} 
            />
            <div className="absolute top-8 left-8 flex flex-col gap-3">
               <span className="px-4 py-1.5 bg-black text-white text-[9px] font-black uppercase tracking-[0.3em] rounded-full">New Gen · 2026</span>
-              <div className="flex items-center gap-2 px-3 py-1 bg-white border border-border rounded-full shadow-sm text-[9px] font-black uppercase text-success tracking-widest">
+              <div className={`flex items-center gap-2 px-3 py-1 border border-border rounded-full shadow-sm text-[9px] font-black uppercase text-success tracking-widest ${darkMode ? 'bg-slate-950 border-slate-800' : 'bg-white'}`}>
                 <CheckCircle size={10} /> Certified Authentic
               </div>
            </div>
@@ -130,21 +132,21 @@ const ProductDetails = () => {
           <div className="space-y-6 border-b border-border pb-12">
              <div className="space-y-2">
                 <p className="text-accent text-[10px] font-black uppercase tracking-[0.5em]">{product.category}</p>
-                <h1 className="text-4xl sm:text-5xl font-black text-primary uppercase tracking-tighter leading-none">{product.name}</h1>
+                <h1 className={`text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none ${darkMode ? 'text-white' : 'text-primary'}`}>{product.name}</h1>
              </div>
              
              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-1.5 px-4 py-1.5 bg-success/5 text-success border border-success/10 rounded-sm font-black text-sm">
+                <div className={`flex items-center gap-1.5 px-4 py-1.5 border border-success/10 rounded-sm font-black text-sm ${darkMode ? 'bg-success/10 text-success' : 'bg-success/5 text-success'}`}>
                    <span>{product.rating.toFixed(1)}</span>
                    <Star size={14} className="fill-success" />
                 </div>
                 <div className="h-6 w-px bg-border"></div>
-                <span className="text-xs font-black text-text-muted uppercase tracking-widest">{product.numReviews} Verified Reviews</span>
+                <span className={`text-xs font-black uppercase tracking-widest ${darkMode ? 'text-slate-500' : 'text-text-muted'}`}>{product.numReviews} Verified Reviews</span>
              </div>
 
              <div className="flex items-baseline gap-4">
-                <span className="text-4xl font-black text-primary tracking-tighter">₹{(product.price * 0.8).toLocaleString()}</span>
-                <span className="text-lg text-text-muted line-through font-bold decoration-danger/30 decoration-2">₹{product.price.toLocaleString()}</span>
+                <span className={`text-4xl font-black tracking-tighter ${darkMode ? 'text-white text-glow' : 'text-primary'}`}>₹{(product.price * 0.8).toLocaleString()}</span>
+                <span className={`text-lg line-through font-bold decoration-danger/30 decoration-2 ${darkMode ? 'text-slate-500' : 'text-text-muted'}`}>₹{product.price.toLocaleString()}</span>
                 <span className="px-3 py-1 bg-warning text-white text-[10px] font-black uppercase tracking-widest rounded-sm">20% OFF</span>
              </div>
           </div>
@@ -156,32 +158,32 @@ const ProductDetails = () => {
             >
               INITIATE PURCHASE <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
-            <button className="bg-white border-2 border-primary text-primary px-10 py-6 rounded-sm text-xs font-black uppercase tracking-[0.3em] hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+            <button className={`border-2 border-primary px-10 py-6 rounded-sm text-xs font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-2 ${darkMode ? 'bg-white text-primary hover:bg-slate-100' : 'bg-white text-primary hover:bg-slate-50'}`}>
               <Heart size={18} strokeWidth={2.5} />
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 pb-10 border-b border-border">
-             <div className="p-5 border border-border rounded-sm flex items-start gap-4">
+           <div className={`grid grid-cols-2 gap-4 pb-10 border-b ${darkMode ? 'border-slate-800' : 'border-border'}`}>
+             <div className={`p-5 border rounded-sm flex items-start gap-4 ${darkMode ? 'border-slate-800' : 'border-border'}`}>
                 <Truck className="text-accent" size={20} />
                 <div className="space-y-1">
-                   <p className="text-[10px] font-black uppercase tracking-widest text-primary">EXPRESS SHIP</p>
-                   <p className="text-[9px] text-text-muted font-bold font-medium leading-none">Delivered by Tomorrow</p>
+                   <p className={`text-[10px] font-black uppercase tracking-widest ${darkMode ? 'text-white' : 'text-primary'}`}>EXPRESS SHIP</p>
+                   <p className={`text-[9px] font-bold font-medium leading-none ${darkMode ? 'text-slate-500' : 'text-text-muted'}`}>Delivered by Tomorrow</p>
                 </div>
              </div>
-             <div className="p-5 border border-border rounded-sm flex items-start gap-4">
+             <div className={`p-5 border rounded-sm flex items-start gap-4 ${darkMode ? 'border-slate-800' : 'border-border'}`}>
                 <ShieldCheck className="text-success" size={20} />
                 <div className="space-y-1">
-                   <p className="text-[10px] font-black uppercase tracking-widest text-primary">WARRENTY PRO</p>
-                   <p className="text-[9px] text-text-muted font-bold font-medium leading-none">2 Year Full Coverage</p>
+                   <p className={`text-[10px] font-black uppercase tracking-widest ${darkMode ? 'text-white' : 'text-primary'}`}>WARRENTY PRO</p>
+                   <p className={`text-[9px] font-bold font-medium leading-none ${darkMode ? 'text-slate-500' : 'text-text-muted'}`}>2 Year Full Coverage</p>
                 </div>
              </div>
           </div>
 
           <div className="space-y-8">
-             <div className="flex gap-10 border-b border-border">
+             <div className={`flex gap-10 border-b ${darkMode ? 'border-slate-800' : 'border-border'}`}>
                 {['Description', 'Specifications', 'Reviews'].map(tab => (
-                  <button key={tab} onClick={() => setActiveTab(tab.toLowerCase())} className={`pb-5 text-[11px] font-black uppercase tracking-[0.3em] transition-all relative ${activeTab === tab.toLowerCase() ? 'text-primary' : 'text-text-muted hover:text-primary'}`}>
+                  <button key={tab} onClick={() => setActiveTab(tab.toLowerCase())} className={`pb-5 text-[11px] font-black uppercase tracking-[0.3em] transition-all relative ${activeTab === tab.toLowerCase() ? (darkMode ? 'text-white' : 'text-primary') : (darkMode ? 'text-slate-500 hover:text-white' : 'text-text-muted hover:text-primary')}`}>
                      {tab}
                      {activeTab === tab.toLowerCase() && <motion.div layoutId="tab-active" className="absolute bottom-0 left-0 w-full h-[3px] bg-accent" />}
                   </button>
@@ -192,16 +194,16 @@ const ProductDetails = () => {
                 <AnimatePresence mode="wait">
                   {activeTab === 'description' && (
                     <motion.div key="desc" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 1, x: 10 }}>
-                       <p className="text-lg font-bold text-primary mb-6 italic">Engineering The Future.</p>
+                       <p className={`text-lg font-bold mb-6 italic ${darkMode ? 'text-slate-300' : 'text-primary'}`}>Engineering The Future.</p>
                        {product.description}
                     </motion.div>
                   )}
                   {activeTab === 'specifications' && (
                     <motion.div key="specs" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                        {product.specs && Object.entries(product.specs).map(([k, v]) => (
-                         <div key={k} className="flex justify-between border-b border-border py-4">
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted">{k}</span>
-                            <span className="text-xs font-black text-primary uppercase">{v}</span>
+                         <div key={k} className={`flex justify-between border-b py-4 ${darkMode ? 'border-slate-800' : 'border-border'}`}>
+                            <span className={`text-[10px] font-black uppercase tracking-[0.4em] ${darkMode ? 'text-slate-500' : 'text-text-muted'}`}>{k}</span>
+                            <span className={`text-xs font-black uppercase ${darkMode ? 'text-white' : 'text-primary'}`}>{v}</span>
                          </div>
                        ))}
                     </motion.div>
@@ -210,9 +212,9 @@ const ProductDetails = () => {
                     <motion.div key="reviews" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-10">
                        <div className="space-y-6">
                           {product.reviews && product.reviews.length > 0 ? product.reviews.map((r, i) => (
-                             <div key={i} className="p-6 bg-slate-50 border border-border rounded-sm space-y-3">
+                             <div key={i} className={`p-6 border rounded-sm space-y-3 ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-border'}`}>
                                 <div className="flex justify-between items-center">
-                                   <p className="text-xs font-black uppercase tracking-widest text-primary">{r.name}</p>
+                                   <p className={`text-xs font-black uppercase tracking-widest ${darkMode ? 'text-white' : 'text-primary'}`}>{r.name}</p>
                                    <div className="flex text-success"><Star size={10} className="fill-success" /> {r.rating}</div>
                                 </div>
                                 <p className="text-xs text-text-secondary leading-loose italic">"{r.comment}"</p>
@@ -222,13 +224,13 @@ const ProductDetails = () => {
                        </div>
 
                        <div className="pt-10 border-t border-dashed border-border space-y-6">
-                          <h4 className="text-xs font-black text-primary uppercase tracking-[0.4em]">Post New Experience</h4>
+                          <h4 className={`text-xs font-black uppercase tracking-[0.4em] ${darkMode ? 'text-white' : 'text-primary'}`}>Post New Experience</h4>
                           <form onSubmit={submitReviewHandler} className="space-y-4">
-                             <input value={reviewerName} onChange={e => setReviewerName(e.target.value)} placeholder="IDENTIFY YOURSELF" className="w-full bg-white border border-border px-6 py-4 text-[11px] font-black tracking-widest focus:border-accent outline-none" required />
-                             <select value={rating} onChange={e => setRating(e.target.value)} className="w-full bg-white border border-border px-6 py-4 text-[11px] font-black tracking-widest focus:border-accent outline-none">
-                                {[5,4,3,2,1].map(v => <option key={v} value={v}>{v} STAR RATING</option>)}
+                             <input value={reviewerName} onChange={e => setReviewerName(e.target.value)} placeholder="IDENTIFY YOURSELF" className={`w-full border border-border px-6 py-4 text-[11px] font-black tracking-widest focus:border-accent outline-none ${darkMode ? 'bg-slate-800 text-white border-slate-700' : 'bg-white text-primary'}`} required />
+                             <select value={rating} onChange={e => setRating(e.target.value)} className={`w-full border border-border px-6 py-4 text-[11px] font-black tracking-widest focus:border-accent outline-none ${darkMode ? 'bg-slate-800 text-white border-slate-700' : 'bg-white text-primary'}`}>
+                                {[5,4,3,2,1].map(v => <option key={v} value={v} className={darkMode ? 'bg-slate-900 text-white' : 'bg-white text-primary'}>{v} STAR RATING</option>)}
                              </select>
-                             <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="LOG YOUR FEEDBACK" className="w-full h-32 bg-white border border-border px-6 py-4 text-[11px] font-black tracking-widest focus:border-accent outline-none resize-none" required />
+                             <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="LOG YOUR FEEDBACK" className={`w-full h-32 border border-border px-6 py-4 text-[11px] font-black tracking-widest focus:border-accent outline-none resize-none ${darkMode ? 'bg-slate-800 text-white border-slate-700' : 'bg-white text-primary'}`} required />
                              <button disabled={submittingReview} className="w-full bg-accent text-white py-5 text-[11px] font-black tracking-widest hover:bg-primary transition-all disabled:opacity-50 flex items-center justify-center gap-4 uppercase">
                                 {submittingReview ? <Loader2 className="animate-spin" size={14} /> : <Send size={14} />} SUBMIT INTEL
                              </button>

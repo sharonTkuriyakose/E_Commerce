@@ -32,23 +32,51 @@ const AppContent = () => {
   const isAuthPage = ['/login', '/signup'].includes(location.pathname);
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-500 ${darkMode ? 'bg-slate-950 text-white' : 'bg-white text-primary'}`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div className={`min-h-screen flex flex-col transition-colors duration-500 ${darkMode ? 'bg-slate-950 text-white' : 'bg-white text-primary'}`}>
       {!isAuthPage && <Navbar />}
 
-      <main className="flex-grow">
+      <main className="flex-grow flex flex-col w-full">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/categories" element={<Products />} />
-          <Route path="/product/:id" element={<ProductDetails />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/compare" element={<Compare />} />
+          <Route path="/" element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } />
+          <Route path="/products" element={
+            <ProtectedRoute>
+              <Products />
+            </ProtectedRoute>
+          } />
+          <Route path="/categories" element={
+            <ProtectedRoute>
+              <Products />
+            </ProtectedRoute>
+          } />
+          <Route path="/product/:id" element={
+            <ProtectedRoute>
+              <ProductDetails />
+            </ProtectedRoute>
+          } />
+          <Route path="/cart" element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          } />
+          <Route path="/compare" element={
+            <ProtectedRoute>
+              <Compare />
+            </ProtectedRoute>
+          } />
           <Route path="/checkout" element={
             <ProtectedRoute>
               <Checkout />
             </ProtectedRoute>
           } />
-          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/wishlist" element={
+            <ProtectedRoute>
+              <Wishlist />
+            </ProtectedRoute>
+          } />
           <Route path="/login" element={<Auth isLogin={true} />} />
           <Route path="/signup" element={<Auth isLogin={false} />} />
           <Route path="/profile" element={

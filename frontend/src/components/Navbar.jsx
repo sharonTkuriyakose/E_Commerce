@@ -123,30 +123,30 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center gap-6 border-r border-border pr-6 mr-1">
             {/* User Account */}
             <div className="relative group">
-               <button className="flex flex-col items-center gap-1 group">
-                 <User size={20} className={`${darkMode ? 'text-slate-300' : 'text-primary'} group-hover:text-accent transition-colors`} />
-                 <span className={`text-[10px] font-bold uppercase tracking-wider group-hover:text-primary ${darkMode ? 'text-slate-500' : 'text-text-secondary'}`}>Profile</span>
-               </button>
+                <button className="flex flex-col items-center gap-1 group">
+                  <User size={20} className={`${darkMode ? 'text-slate-300 group-hover:text-accent' : 'text-primary group-hover:text-accent'} transition-colors`} />
+                  <span className={`text-[10px] font-bold uppercase tracking-wider transition-all ${darkMode ? 'text-slate-500 group-hover:text-white' : 'text-text-secondary group-hover:text-primary'}`}>Profile</span>
+                </button>
                
-               <div className="absolute right-[-20px] top-full pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                  <div className="bg-white shadow-2xl border border-border rounded-sm w-64 p-5 space-y-4">
+               <div className={`absolute right-[-20px] top-full pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50`}>
+                  <div className={`shadow-2xl border border-border rounded-sm w-64 p-5 space-y-4 ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white'}`}>
                      {userInfo ? (
                         <>
-                           <div className="pb-3 border-b border-border">
-                              <p className="text-sm font-bold text-primary truncate">Hello, {userInfo.name}</p>
-                              <p className="text-[10px] text-text-muted truncate">{userInfo.email}</p>
+                           <div className={`pb-3 border-b ${darkMode ? 'border-slate-800' : 'border-border'}`}>
+                              <p className={`text-sm font-bold truncate ${darkMode ? 'text-white' : 'text-primary'}`}>Hello, {userInfo.name}</p>
+                              <p className={`text-[10px] truncate ${darkMode ? 'text-slate-500' : 'text-text-muted'}`}>{userInfo.email}</p>
                            </div>
                            <div className="flex flex-col gap-3">
-                              <Link to="/profile" className="text-xs font-bold text-text-secondary hover:text-accent transition-colors">Orders</Link>
-                              <Link to="/wishlist" className="text-xs font-bold text-text-secondary hover:text-accent transition-colors">Wishlist</Link>
+                              <Link to="/profile" className={`text-xs font-bold hover:text-accent transition-colors ${darkMode ? 'text-slate-300' : 'text-text-secondary'}`}>Orders</Link>
+                              <Link to="/wishlist" className={`text-xs font-bold hover:text-accent transition-colors ${darkMode ? 'text-slate-300' : 'text-text-secondary'}`}>Wishlist</Link>
                               {userInfo.isAdmin && <Link to="/admin/dashboard" className="text-xs font-bold text-accent">Admin Dashboard</Link>}
                               <button onClick={handleLogout} className="text-xs font-bold text-danger text-left uppercase tracking-widest mt-1">End Session</button>
                            </div>
                         </>
                      ) : (
                         <div className="space-y-4">
-                           <p className="text-sm font-bold text-primary leading-tight font-black uppercase tracking-tight">Premium Retail Member</p>
-                           <Link to="/login" className="block w-full py-2.5 text-center text-accent border border-border font-bold text-xs uppercase hover:bg-slate-50 transition-colors">Login / Signup</Link>
+                           <p className={`text-sm font-bold leading-tight font-black uppercase tracking-tight ${darkMode ? 'text-white' : 'text-primary'}`}>Premium Retail Member</p>
+                           <Link to="/login" className={`block w-full py-2.5 text-center font-bold text-xs uppercase border border-border transition-colors ${darkMode ? 'text-accent hover:bg-slate-800' : 'text-accent hover:bg-slate-50'}`}>Login / Signup</Link>
                         </div>
                      )}
                   </div>
@@ -155,28 +155,28 @@ const Navbar = () => {
 
             {/* Wishlist */}
             <Link to="/wishlist" className="flex flex-col items-center gap-1 group relative">
-              <div className="relative">
-                <Heart size={20} className={`${darkMode ? 'text-slate-300' : 'text-primary'} group-hover:text-accent transition-colors`} />
-                {wishlistItems && wishlistItems.length > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[7px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white">
-                    {wishlistItems.length}
-                  </span>
-                )}
-              </div>
-              <span className={`text-[10px] font-bold uppercase tracking-wider group-hover:text-primary ${darkMode ? 'text-slate-500' : 'text-text-secondary'}`}>Wishlist</span>
+               <div className="relative">
+                 <Heart size={20} className={`${darkMode ? 'text-slate-300 group-hover:text-accent' : 'text-primary group-hover:text-accent'} transition-colors`} />
+                 {wishlistItems && wishlistItems.length > 0 && (
+                   <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[7px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white">
+                     {wishlistItems.length}
+                   </span>
+                 )}
+               </div>
+               <span className={`text-[10px] font-bold uppercase tracking-wider transition-all ${darkMode ? 'text-slate-500 group-hover:text-white' : 'text-text-secondary group-hover:text-primary'}`}>Wishlist</span>
             </Link>
 
             {/* Compare Hub - Advanced Feature */}
             <Link to="/compare" className="flex flex-col items-center gap-1 group relative">
-              <div className="relative">
-                <LayoutPanelLeft size={20} className={`${darkMode ? 'text-slate-300' : 'text-primary'} group-hover:text-accent transition-colors`} />
-                {compareItems && compareItems.length > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 bg-accent text-white text-[7px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white">
-                    {compareItems.length}
-                  </span>
-                )}
-              </div>
-              <span className={`text-[10px] font-bold uppercase tracking-wider group-hover:text-primary ${darkMode ? 'text-slate-500' : 'text-text-secondary'}`}>Compare</span>
+               <div className="relative">
+                 <LayoutPanelLeft size={20} className={`${darkMode ? 'text-slate-300 group-hover:text-accent' : 'text-primary group-hover:text-accent'} transition-colors`} />
+                 {compareItems && compareItems.length > 0 && (
+                   <span className="absolute -top-1.5 -right-1.5 bg-accent text-white text-[7px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white">
+                     {compareItems.length}
+                   </span>
+                 )}
+               </div>
+               <span className={`text-[10px] font-bold uppercase tracking-wider transition-colors ${darkMode ? 'text-slate-500 group-hover:text-white' : 'text-text-secondary group-hover:text-primary'}`}>Compare</span>
             </Link>
 
             {/* Theme Toggle - Advanced Feature */}
@@ -188,7 +188,7 @@ const Navbar = () => {
                   <Moon size={20} className="text-primary hover:text-accent hover:scale-110 transition-transform" />
                 )}
               </div>
-              <span className={`text-[10px] font-bold uppercase tracking-wider group-hover:text-primary ${darkMode ? 'text-slate-500' : 'text-text-secondary'}`}>Theme</span>
+               <span className={`text-[10px] font-bold uppercase tracking-wider transition-colors ${darkMode ? 'text-slate-500 group-hover:text-white' : 'text-text-secondary group-hover:text-primary'}`}>Theme</span>
             </button>
           </div>
 
@@ -202,10 +202,10 @@ const Navbar = () => {
                    </span>
                 )}
              </div>
-             <span className={`text-[10px] font-bold uppercase tracking-wider group-hover:text-primary ${darkMode ? 'text-slate-500' : 'text-text-secondary'}`}>Bag</span>
-          </Link>
+              <span className={`text-[10px] font-bold uppercase tracking-wider transition-colors ${darkMode ? 'text-slate-500 group-hover:text-white' : 'text-text-secondary group-hover:text-primary'}`}>Bag</span>
+           </Link>
 
-          <button className="lg:hidden text-primary" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          <button className={`lg:hidden ${darkMode ? 'text-white' : 'text-primary'}`} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -214,19 +214,20 @@ const Navbar = () => {
       {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            className="fixed inset-0 bg-white z-200 lg:hidden p-8"
-          >
-             <div className="flex items-center justify-between mb-12">
+          <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
+          className={`fixed inset-0 bg-black/60 backdrop-blur-xl z-200 lg:hidden overflow-y-auto no-scrollbar ${darkMode ? 'bg-slate-950 text-white' : 'bg-white'}`}
+          id="mobile-menu"
+        >
+             <div className="flex items-center justify-between mb-12 p-8">
                 <span className="text-xl font-black uppercase">Menu</span>
                 <button onClick={() => setIsMobileMenuOpen(false)}><X size={32} /></button>
              </div>
-             <div className="flex flex-col gap-6">
+             <div className="flex flex-col gap-6 px-8">
                 {navLinks.map((link) => (
-                  <Link key={link.path} to={link.path} onClick={() => setIsMobileMenuOpen(false)} className="text-2xl font-black uppercase tracking-tighter border-b pb-4 border-border">{link.name}</Link>
+                   <Link key={link.path} to={link.path} onClick={() => setIsMobileMenuOpen(false)} className={`text-2xl font-black uppercase tracking-tighter border-b pb-4 ${darkMode ? 'border-slate-800' : 'border-border'}`}>{link.name}</Link>
                 ))}
              </div>
           </motion.div>

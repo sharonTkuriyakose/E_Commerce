@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { ShieldCheck, Calendar, Activity, Check, ArrowRight, Package, User, ShoppingBag, Truck, CheckCircle2, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 
 const Profile = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { userInfo } = useAuth();
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     const fetchMyOrders = async () => {
@@ -33,7 +35,7 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-32 flex flex-col items-center justify-center bg-white space-y-6">
+      <div className={`min-h-screen pt-32 flex flex-col items-center justify-center space-y-6 ${darkMode ? 'bg-slate-950 text-white' : 'bg-white'}`}>
         <div className="w-16 h-16 rounded-2xl border-2 border-accent/10 border-t-accent animate-spin"></div>
         <p className="text-[10px] font-black uppercase tracking-[0.5em] text-accent">Accessing Secure Archives...</p>
       </div>
@@ -41,7 +43,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="pt-32 min-h-screen bg-white selection:bg-accent/30 overflow-x-hidden border-t border-border">
+    <div className={`pt-32 min-h-screen selection:bg-accent/30 overflow-x-hidden border-t border-border transition-colors duration-500 ${darkMode ? 'bg-slate-950 text-white' : 'bg-white text-primary'}`}>
       <div className="container mx-auto px-6 pb-24 max-w-6xl">
         {/* User Intelligence Header */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-20">
@@ -72,7 +74,7 @@ const Profile = () => {
              initial={{ opacity: 0, scale: 0.95 }}
              animate={{ opacity: 1, scale: 1 }}
              transition={{ delay: 0.2 }}
-             className="bg-slate-50 p-10 border border-border rounded-sm flex flex-col justify-center"
+             className={`p-10 border border-border rounded-sm flex flex-col justify-center ${darkMode ? 'bg-slate-900 text-white' : 'bg-slate-50'}`}
            >
               <div className="text-[10px] font-black text-text-muted uppercase tracking-[0.4em] mb-4">Total Acquisitions</div>
               <div className="text-7xl font-black text-primary tracking-tighter leading-none">{orders.length}</div>
@@ -92,7 +94,7 @@ const Profile = () => {
                SECURE ARCHIVE ACCESS DENIED: {error}
              </div>
            ) : orders.length === 0 ? (
-             <div className="group relative p-20 rounded-sm bg-slate-50 border border-border flex flex-col items-center justify-center space-y-10 overflow-hidden">
+             <div className={`group relative p-20 rounded-sm border border-border flex flex-col items-center justify-center space-y-10 overflow-hidden ${darkMode ? 'bg-slate-900' : 'bg-slate-50'}`}>
                 <ShoppingBag size={80} className="text-primary/5 group-hover:text-accent/20 transition-all duration-700 transform group-hover:rotate-12" />
                 <div className="text-center space-y-4">
                    <h3 className="text-2xl font-black text-primary uppercase tracking-tighter opacity-30">Log Database Empty</h3>
@@ -109,12 +111,12 @@ const Profile = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1 }}
-                    className="group relative rounded-sm bg-white border border-border hover:border-accent transition-all duration-500 hover:shadow-2xl hover:shadow-accent/5"
+                    className={`group relative rounded-sm border border-border hover:border-accent transition-all duration-500 hover:shadow-2xl hover:shadow-accent/5 ${darkMode ? 'bg-slate-900 text-white' : 'bg-white text-primary'}`}
                   >
                      <div className="p-8 md:p-12 flex flex-col gap-12">
                         <div className="flex flex-col md:flex-row items-center justify-between gap-8 pb-10 border-b border-border">
                            <div className="flex items-center gap-8">
-                              <div className="w-16 h-16 bg-slate-50 border border-border flex items-center justify-center group-hover:bg-accent/10 transition-all duration-500 rounded-sm">
+                              <div className={`w-16 h-16 border border-border flex items-center justify-center group-hover:bg-accent/10 transition-all duration-500 rounded-sm ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
                                 <Package size={28} className="text-primary opacity-40 group-hover:text-accent" />
                               </div>
                               <div className="space-y-1">
@@ -151,7 +153,7 @@ const Profile = () => {
                                 { label: 'DELIVERED', icon: ShieldCheck, status: order.isDelivered ? 'completed' : 'upcoming', time: order.isDelivered ? 'ARRIVED' : 'EST. 2 DAYS' }
                               ].map((step, idx) => (
                                 <div key={idx} className="flex md:flex-col items-center gap-6 md:gap-4 relative z-10">
-                                   <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 bg-white transition-all duration-500 ${
+                                   <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${darkMode ? 'bg-slate-900' : 'bg-white'} ${
                                      step.status === 'completed' ? 'border-success text-success shadow-lg shadow-success/20 scale-110' : 
                                      step.status === 'active' ? 'border-accent text-accent animate-pulse' : 'border-slate-200 text-slate-300'
                                    }`}>
@@ -169,7 +171,7 @@ const Profile = () => {
                         <div className="pt-10 border-t border-border mt-4">
                            <div className="flex flex-wrap gap-4">
                               {order.orderItems.map((item, idx) => (
-                                <div key={idx} className="bg-slate-50 border border-border px-6 py-4 flex items-center gap-6 rounded-sm">
+                                <div key={idx} className={`border border-border px-6 py-4 flex items-center gap-6 rounded-sm ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
                                    <div className="w-10 h-10 rounded-full bg-white border border-border flex items-center justify-center text-[11px] font-black shrink-0">x{item.quantity}</div>
                                    <span className="text-[13px] font-black text-primary uppercase truncate max-w-[300px]">{item.name}</span>
                                 </div>

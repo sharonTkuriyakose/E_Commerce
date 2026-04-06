@@ -67,7 +67,7 @@ const Home = () => {
              >
                THE FUTURE <br/>
                <span className="text-accent italic leading-none block pt-4">UNLOCKED.</span> <br/>
-               <span className={darkMode ? 'text-slate-800' : 'text-text-muted'}>70% OFF.</span>
+               <span className={darkMode ? 'text-slate-600' : 'text-text-muted'}>70% OFF.</span>
              </motion.h1>
  
              <motion.p 
@@ -86,7 +86,7 @@ const Home = () => {
                className="flex flex-wrap items-center justify-center lg:justify-start gap-6 pt-6"
             >
               <Link to="/products" className="btn-primary !px-12 !py-5">Shop Collection</Link>
-              <Link to="/categories" className={`btn-outline !px-12 !py-5 ${darkMode ? 'border-slate-800 text-white hover:bg-slate-800' : ''}`}>Categories</Link>
+              <Link to="/products" className={`btn-outline !px-12 !py-5 ${darkMode ? 'bg-transparent! text-white! border-slate-700 hover:bg-slate-800!' : 'bg-transparent! text-primary! border-border hover:bg-slate-100!'}`}>Categories</Link>
             </motion.div>
           </div>
 
@@ -150,15 +150,15 @@ const Home = () => {
       </div>
  
        {/* ========== CATEGORY WHEEL ========== */}
-       <section id="categories-wheel" className="py-24 bg-white border-b border-border shadow-sm">
+       <section id="categories-wheel" className={`py-24 border-b border-border shadow-sm transition-colors duration-500 ${darkMode ? 'bg-slate-950' : 'bg-white'}`}>
          <div className="container mx-auto px-6">
             <div className="flex flex-wrap items-center justify-center gap-10 sm:gap-20 lg:gap-24">
                {categories.map((cat, i) => (
                  <motion.div key={cat.id} initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} onClick={() => navigate(`/products?category=${cat.id}`)} className="flex flex-col items-center gap-8 cursor-pointer group">
-                    <div className="w-24 h-24 sm:w-32 lg:w-44 h-24 sm:h-32 lg:h-44 rounded-full border border-border p-2 group-hover:border-accent group-hover:ring-8 group-hover:ring-accent/10 transition-all duration-500 relative bg-white shadow-md overflow-hidden">
-                       <img src={cat.image} className="w-full h-full rounded-full object-cover group-hover:scale-105" alt={cat.name} />
-                    </div>
-                    <span className="text-[13px] font-black uppercase tracking-[0.3em] text-text-muted group-hover:text-primary transition-all">{cat.name}</span>
+                     <div className={`w-24 h-24 sm:w-32 lg:w-44 h-24 sm:h-32 lg:h-44 rounded-full border border-border p-2 group-hover:border-accent group-hover:ring-8 group-hover:ring-accent/10 transition-all duration-500 relative shadow-md overflow-hidden ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white'}`}>
+                        <img src={cat.image} className={`w-full h-full rounded-full object-cover group-hover:scale-105 ${darkMode ? 'opacity-80' : ''}`} alt={cat.name} />
+                     </div>
+                     <span className={`text-[13px] font-black uppercase tracking-[0.3em] transition-all ${darkMode ? 'text-slate-300 group-hover:text-accent' : 'text-text-muted group-hover:text-primary'}`}>{cat.name}</span>
                  </motion.div>
                ))}
             </div>
@@ -166,11 +166,11 @@ const Home = () => {
        </section>
 
       {/* ========== CURATED SELECTION ========== */}
-      <section id="featured" className="py-24 border-t border-border bg-slate-50">
+      <section id="featured" className={`py-24 border-t border-border transition-colors duration-500 ${darkMode ? 'bg-slate-900/50' : 'bg-slate-50'}`}>
         <div className="container mx-auto px-6">
           <div className="flex flex-col items-center mb-16 text-center space-y-4">
-            <h2 className="section-heading">Featured Collection</h2>
-            <p className="section-subtext">Premium electronics handpicked by our experts for your modern lifestyle.</p>
+            <h2 className={`section-heading ${darkMode ? 'text-white' : ''}`}>Featured Collection</h2>
+            <p className={`section-subtext ${darkMode ? 'text-slate-400' : ''}`}>Premium electronics handpicked by our experts for your modern lifestyle.</p>
           </div>
 
           {loading ? (
@@ -227,7 +227,7 @@ const Home = () => {
                  >
                     <div className="mb-6 transform group-hover:scale-110 transition-transform duration-500">{feature.icon}</div>
                     <h4 className={`text-sm font-black tracking-[0.2em] mb-3 ${darkMode ? 'text-white' : 'text-primary'}`}>{feature.title}</h4>
-                    <p className="text-text-muted text-sm leading-relaxed">{feature.desc}</p>
+                    <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-400' : 'text-text-muted'}`}>{feature.desc}</p>
                  </motion.div>
                ))}
             </div>
@@ -250,7 +250,7 @@ const Home = () => {
       </section>
 
       {/* ========== TRUST SIGNALS ========== */}
-      <section id="trust" className="py-24 bg-white">
+      <section id="trust" className={`py-24 transition-colors duration-500 ${darkMode ? 'bg-slate-950' : 'bg-white'}`}>
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             {[
@@ -259,12 +259,12 @@ const Home = () => {
               { icon: RotateCcw, title: 'Easy Returns', desc: '30-day hassle-free exchange' },
               { icon: Headphones, title: 'Direct Support', desc: 'Expert tech support via call/chat' },
             ].map((item, i) => (
-              <motion.div key={i} whileHover={{ y: -5 }} className="flex flex-col items-center text-center space-y-4 p-8 rounded-2xl hover:bg-slate-50 transition-all">
-                <div className="w-16 h-16 rounded-full bg-slate-50 border border-border flex items-center justify-center text-accent shadow-sm">
+              <motion.div key={i} whileHover={{ y: -5 }} className={`flex flex-col items-center text-center space-y-4 p-8 rounded-2xl transition-all ${darkMode ? 'hover:bg-slate-900 border border-transparent hover:border-slate-800' : 'hover:bg-slate-50'}`}>
+                <div className={`w-16 h-16 rounded-full border border-border flex items-center justify-center text-accent shadow-sm ${darkMode ? 'bg-slate-900' : 'bg-slate-50'}`}>
                   <item.icon size={28} strokeWidth={2.5} />
                 </div>
-                <h3 className="text-sm font-black text-primary uppercase tracking-widest">{item.title}</h3>
-                <p className="text-xs text-text-muted leading-relaxed font-medium">{item.desc}</p>
+                <h3 className={`text-sm font-black uppercase tracking-widest ${darkMode ? 'text-white' : 'text-primary'}`}>{item.title}</h3>
+                <p className={`text-xs leading-relaxed font-medium ${darkMode ? 'text-slate-400' : 'text-text-muted'}`}>{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -272,36 +272,36 @@ const Home = () => {
       </section>
 
       {/* ========== NEWSLETTER SECTION - Added Feature ========== */}
-      <section className="bg-bg-alt border-y border-border py-24">
+      <section className={`border-y border-border py-24 transition-colors duration-500 ${darkMode ? 'bg-slate-900/80' : 'bg-bg-alt'}`}>
          <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 items-center gap-16">
             <div className="space-y-6">
                <div className="flex items-center gap-3">
                   <div className="h-1 w-12 bg-accent"></div>
                   <span className="text-[10px] font-black text-accent uppercase tracking-[0.5em]">Membership Protocol</span>
                </div>
-               <h2 className="text-4xl font-black text-primary uppercase tracking-tighter leading-tight">Join The Elite <br/> Tech Circle.</h2>
-               <p className="text-sm text-text-muted font-medium max-w-sm leading-relaxed">Early access to limited drops, high-tech insights, and exclusive member-only pricing delivered weekly.</p>
+               <h2 className={`text-4xl font-black uppercase tracking-tighter leading-tight ${darkMode ? 'text-white' : 'text-primary'}`}>Join The Elite <br/> Tech Circle.</h2>
+               <p className={`text-sm font-medium max-w-sm leading-relaxed ${darkMode ? 'text-slate-400' : 'text-text-muted'}`}>Early access to limited drops, high-tech insights, and exclusive member-only pricing delivered weekly.</p>
             </div>
             <div className="flex flex-col gap-4">
                <div className="flex gap-2">
-                  <input type="email" placeholder="ENTER YOUR EMAIL ADDRESS" className="flex-grow bg-white border border-border px-6 py-5 text-[11px] font-black tracking-widest focus:outline-none focus:border-accent" />
+                  <input type="email" placeholder="ENTER YOUR EMAIL ADDRESS" className={`flex-grow border border-border px-6 py-5 text-[11px] font-black tracking-widest focus:outline-none focus:border-accent ${darkMode ? 'bg-slate-800 text-white' : 'bg-white text-primary'}`} />
                   <button className="bg-primary text-white px-10 py-5 text-[11px] font-black tracking-widest hover:bg-accent transition-all">SUBSCRIBE</button>
                </div>
                <div className="flex items-center gap-3 px-2">
                   <CheckCircle2 size={12} className="text-success" />
-                  <span className="text-[9px] text-text-muted font-bold uppercase tracking-widest">No spam. Only high-end flagship updates.</span>
+                  <span className={`text-[9px] font-bold uppercase tracking-widest ${darkMode ? 'text-slate-500' : 'text-text-muted'}`}>No spam. Only high-end flagship updates.</span>
                </div>
             </div>
          </div>
       </section>
 
       {/* ========== FINAL QUOTE ========== */}
-      <section id="quote" className="py-24 bg-white">
+      <section id="quote" className={`py-24 transition-colors duration-500 ${darkMode ? 'bg-slate-950' : 'bg-white'}`}>
          <div className="container mx-auto px-6 text-center max-w-4xl space-y-8">
             <Star size={40} className="text-accent mx-auto fill-accent opacity-20" />
-            <h2 className="text-3xl md:text-4xl font-black text-primary tracking-tighter italic uppercase leading-none opacity-80 italic">"Technology is best when it brings people together. We bring the best tech to your door."</h2>
+            <h2 className={`text-3xl md:text-4xl font-black tracking-tighter italic uppercase leading-none opacity-80 italic ${darkMode ? 'text-white' : 'text-primary'}`}>"Technology is best when it brings people together. We bring the best tech to your door."</h2>
             <div className="h-1 w-20 bg-accent mx-auto"></div>
-            <p className="text-xs font-black uppercase tracking-widest text-text-muted">TECH STORE REDEFINED EXPERIENCE</p>
+            <p className={`text-xs font-black uppercase tracking-widest ${darkMode ? 'text-slate-500' : 'text-text-muted'}`}>TECH STORE REDEFINED EXPERIENCE</p>
          </div>
        </section>
     </div>

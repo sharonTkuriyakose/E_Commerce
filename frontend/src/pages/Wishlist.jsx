@@ -5,12 +5,14 @@ import { Link } from 'react-router-dom';
 import ProductCard3D from '../components/ProductCard3D';
 
 import { useWishlist } from '../context/WishlistContext';
+import { useTheme } from '../context/ThemeContext';
 
 const Wishlist = () => {
   const { wishlistItems, removeFromWishlist } = useWishlist();
+  const { darkMode } = useTheme();
 
   return (
-    <div className="pt-32 min-h-screen bg-white">
+    <div className={`pt-32 min-h-screen transition-colors duration-500 ${darkMode ? 'bg-slate-950 text-white' : 'bg-white text-primary'}`}>
       <div className="container mx-auto px-6 pb-24">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-text-muted mb-8">
@@ -31,7 +33,7 @@ const Wishlist = () => {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center py-40 text-center"
           >
-             <div className="w-24 h-24 rounded-full bg-slate-50 border border-border flex items-center justify-center mb-10 text-text-muted opacity-30">
+             <div className={`w-24 h-24 rounded-full border border-border flex items-center justify-center mb-10 text-text-muted opacity-30 ${darkMode ? 'bg-slate-900' : 'bg-slate-50'}`}>
                <Heart size={48} strokeWidth={1.5} />
              </div>
              <h2 className="text-3xl font-black text-primary uppercase tracking-tighter mb-4 italic leading-none">Your Wishlist is Empty</h2>
@@ -51,7 +53,7 @@ const Wishlist = () => {
                 <div className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
                    <button 
                      onClick={() => removeFromWishlist(product._id)}
-                     className="w-10 h-10 rounded-full bg-white border border-border flex items-center justify-center text-danger hover:bg-slate-50 shadow-lg"
+                     className={`w-10 h-10 rounded-full border border-border flex items-center justify-center text-danger shadow-lg ${darkMode ? 'bg-slate-800 hover:bg-slate-700' : 'bg-white hover:bg-slate-50'}`}
                    >
                       <X size={20} strokeWidth={3} />
                    </button>

@@ -90,7 +90,7 @@ const ProductCard3D = ({ product }) => {
           <div className={`absolute bottom-4 left-4 inline-flex items-center gap-1.5 px-2 py-1 rounded-sm shadow-sm font-bold text-[10px] border transition-colors ${darkMode ? 'bg-slate-950/90 border-slate-800 text-white' : 'bg-white/90 border-border text-primary'}`}>
             <span>{product.rating}</span>
             <Star size={10} className="fill-success text-success" />
-            <span className="text-text-muted border-l border-border pl-1.5">{product.numReviews || 12} reviews</span>
+            <span className={`border-l pl-1.5 ${darkMode ? 'text-slate-500 border-slate-800' : 'text-text-muted border-border'}`}>{product.numReviews || 12} reviews</span>
           </div>
 
           {/* ADD TO BAG - Myntra style action */}
@@ -114,11 +114,11 @@ const ProductCard3D = ({ product }) => {
           <h3 className={`text-sm font-black tracking-tight leading-tight group-hover:text-accent transition-colors line-clamp-1 uppercase ${darkMode ? 'text-white' : 'text-primary'}`}>
             {product.name}
           </h3>
-          <p className="text-xs text-text-muted line-clamp-1 uppercase tracking-widest font-black text-[9px] opacity-70 italic">Premium Series · {product.category || 'Gear'}</p>
+          <p className={`text-xs line-clamp-1 uppercase tracking-widest font-black text-[9px] opacity-70 italic ${darkMode ? 'text-slate-400' : 'text-text-muted'}`}>Premium Series · {product.category || 'Gear'}</p>
           
           <div className="flex items-center gap-2 pt-1">
             <span className={`text-sm font-black ${darkMode ? 'text-white' : 'text-primary'}`}>₹{Math.floor(discountedPrice).toLocaleString()}</span>
-            <span className="text-[11px] text-text-muted line-through">₹{product.price.toLocaleString()}</span>
+            <span className={`text-[11px] line-through ${darkMode ? 'text-slate-500' : 'text-text-muted'}`}>₹{product.price.toLocaleString()}</span>
             <span className="text-[11px] text-warning font-bold">(20% OFF)</span>
           </div>
         </div>

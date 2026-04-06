@@ -3,11 +3,13 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ArrowLeft, Save, Box, Zap, Layers, CreditCard, Info, Image as ImageIcon, Briefcase, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTheme } from '../../context/ThemeContext';
 
 const ProductEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { userInfo } = useAuth();
+  const { darkMode } = useTheme();
   
   const [name, setName] = useState('');
   const [price, setPrice] = useState(0);
@@ -65,7 +67,7 @@ const ProductEdit = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-32 flex flex-col items-center justify-center bg-dark-bg space-y-6">
+      <div className={`min-h-screen pt-32 flex flex-col items-center justify-center space-y-6 ${darkMode ? 'bg-slate-950 text-white' : 'bg-white'}`}>
         <div className="w-16 h-16 rounded-2xl border-2 border-accent-blue/10 border-t-accent-blue animate-spin"></div>
         <p className="text-[10px] font-black uppercase tracking-[0.5em] text-accent-blue">Deciphering Data Buffer...</p>
       </div>
@@ -73,7 +75,7 @@ const ProductEdit = () => {
   }
 
   return (
-    <div className="pt-32 min-h-screen bg-dark-bg selection:bg-accent-blue/30 overflow-x-hidden">
+    <div className={`pt-32 min-h-screen selection:bg-accent-blue/30 overflow-x-hidden transition-colors duration-500 ${darkMode ? 'bg-slate-950 text-white' : 'bg-white text-primary'}`}>
       <div className="container mx-auto px-6 pb-24 max-w-4xl">
         {/* Navigation & Header */}
         <motion.div 
@@ -86,14 +88,14 @@ const ProductEdit = () => {
               <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> Back to Matrix
             </Link>
             <div className="text-[10px] font-black uppercase tracking-[0.4em] text-accent-blue opacity-70">Configuration Module</div>
-            <h1 className="text-5xl md:text-6xl font-black text-white tracking-tighter uppercase italic leading-none">
-              Modify <span className="text-glow text-accent-blue">Unit</span>
-            </h1>
+            <h1 className={`text-5xl md:text-6xl font-black tracking-tighter uppercase italic leading-none ${darkMode ? 'text-white' : 'text-primary'}`}>
+               Modify <span className={darkMode ? 'text-accent' : 'text-slate-300'}>Unit</span>
+             </h1>
             <p className="text-gray-500 max-w-xl font-medium italic">Adjusting parameters for Node: <span className="text-accent-blue">{id.substring(id.length - 8).toUpperCase()}</span></p>
           </div>
           
           <div className="flex items-center gap-4">
-             <div className="w-16 h-16 rounded-3xl bg-white/5 border border-white/5 flex items-center justify-center p-3">
+              <div className={`w-16 h-16 rounded-3xl border flex items-center justify-center p-3 ${darkMode ? 'bg-white/5 border-white/5' : 'bg-slate-50 border-border'}`}>
                 <img src={image} alt="prev" className="w-full h-full object-contain grayscale opacity-50" />
              </div>
              <div className="px-5 py-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest flex items-center gap-2">
@@ -110,37 +112,37 @@ const ProductEdit = () => {
           <form onSubmit={submitHandler} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Core Information */}
-              <div className="glass-panel p-10 border border-white/5 space-y-8 relative overflow-hidden">
+               <div className={`p-10 border rounded-4xl space-y-8 relative overflow-hidden ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-border'}`}>
                  <div className="absolute top-0 left-0 w-1 h-full bg-accent-blue/30 shadow-[0_0_15px_rgba(0,240,255,0.3)]"></div>
                  <div className="flex items-center gap-3 mb-2">
                     <Info size={18} className="text-accent-blue" />
-                    <h2 className="text-sm font-black text-white uppercase tracking-widest">Base Identity</h2>
+                     <h2 className={`text-sm font-black uppercase tracking-widest ${darkMode ? 'text-white' : 'text-primary'}`}>Base Identity</h2>
                  </div>
                  
                  <div className="space-y-6">
                     <div>
                       <label className="block text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3">Unit Designation</label>
-                      <input type="text" value={name} onChange={(e) => setName(e.target.value)} required className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-sm font-black text-white placeholder-gray-700 focus:outline-none focus:border-accent-blue/50 focus:bg-white/[0.05] transition-all tracking-tight uppercase italic" />
+                       <input type="text" value={name} onChange={(e) => setName(e.target.value)} required className={`w-full border rounded-2xl px-6 py-4 text-sm font-black placeholder-gray-700 focus:outline-none transition-all tracking-tight uppercase italic ${darkMode ? 'bg-white/[0.03] border-white/5 text-white focus:border-accent/50 focus:bg-white/[0.05]' : 'bg-white border-border text-primary focus:border-primary'}`} />
                     </div>
 
                     <div className="grid grid-cols-2 gap-6">
                       <div>
                         <label className="block text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3">Fabricator Brand</label>
-                        <input type="text" value={brand} onChange={(e) => setBrand(e.target.value)} required className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-sm font-black text-white focus:outline-none focus:border-accent-blue/50 transition-all uppercase tracking-widest" />
+                         <input type="text" value={brand} onChange={(e) => setBrand(e.target.value)} required className={`w-full border rounded-2xl px-6 py-4 text-sm font-black focus:outline-none transition-all uppercase tracking-widest ${darkMode ? 'bg-white/[0.03] border-white/5 text-white focus:border-accent/50' : 'bg-white border-border text-primary focus:border-primary'}`} />
                       </div>
                       <div>
                         <label className="block text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3">Asset Class</label>
-                        <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} required className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-sm font-black text-white focus:outline-none focus:border-accent-blue/50 transition-all uppercase tracking-widest" />
+                         <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} required className={`w-full border rounded-2xl px-6 py-4 text-sm font-black focus:outline-none transition-all uppercase tracking-widest ${darkMode ? 'bg-white/[0.03] border-white/5 text-white focus:border-accent/50' : 'bg-white border-border text-primary focus:border-primary'}`} />
                       </div>
                     </div>
                  </div>
               </div>
 
               {/* Technical Parameters */}
-              <div className="glass-panel p-10 border border-white/5 space-y-8">
+               <div className={`p-10 border rounded-4xl space-y-8 ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-border'}`}>
                  <div className="flex items-center gap-3 mb-2">
                     <Zap size={18} className="text-amber-400" />
-                    <h2 className="text-sm font-black text-white uppercase tracking-widest">Market Parameters</h2>
+                     <h2 className={`text-sm font-black uppercase tracking-widest ${darkMode ? 'text-white' : 'text-primary'}`}>Market Parameters</h2>
                  </div>
 
                  <div className="space-y-6">
@@ -148,13 +150,13 @@ const ProductEdit = () => {
                       <div>
                         <label className="block text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3">Credit Value (₹)</label>
                         <div className="relative">
-                           <input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} required className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-xl font-black text-white focus:outline-none focus:border-accent-blue/50 transition-all italic tracking-tighter" />
+                            <input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} required className={`w-full border rounded-2xl px-6 py-4 text-xl font-black focus:outline-none transition-all italic tracking-tighter ${darkMode ? 'bg-white/[0.03] border-white/5 text-white focus:border-accent/50' : 'bg-white border-border text-primary focus:border-primary'}`} />
                            <div className="absolute right-6 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-600 uppercase">INR</div>
                         </div>
                       </div>
                       <div>
                         <label className="block text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3">Inventory Nodes</label>
-                        <input type="number" value={countInStock} onChange={(e) => setCountInStock(Number(e.target.value))} required className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-xl font-black text-white focus:outline-none focus:border-accent-blue/50 transition-all italic tracking-tighter" />
+                         <input type="number" value={countInStock} onChange={(e) => setCountInStock(Number(e.target.value))} required className={`w-full border rounded-2xl px-6 py-4 text-xl font-black focus:outline-none transition-all italic tracking-tighter ${darkMode ? 'bg-white/[0.03] border-white/5 text-white focus:border-accent/50' : 'bg-white border-border text-primary focus:border-primary'}`} />
                       </div>
                     </div>
 
@@ -163,7 +165,7 @@ const ProductEdit = () => {
                       <div className="flex gap-4">
                          <div className="flex-1 relative">
                             <ImageIcon size={14} className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-600" />
-                            <input type="text" value={image} onChange={(e) => setImage(e.target.value)} required className="w-full bg-white/[0.03] border border-white/5 rounded-2xl pl-14 pr-6 py-4 text-[10px] font-mono text-gray-400 focus:outline-none focus:border-accent-blue/50 transition-all truncate" />
+                             <input type="text" value={image} onChange={(e) => setImage(e.target.value)} required className={`w-full border rounded-2xl pl-14 pr-6 py-4 text-[10px] font-mono focus:outline-none transition-all truncate ${darkMode ? 'bg-white/[0.03] border-white/5 text-gray-400 focus:border-accent/50' : 'bg-white border-border text-primary focus:border-primary'}`} />
                          </div>
                       </div>
                     </div>
@@ -175,11 +177,11 @@ const ProductEdit = () => {
             <div className="glass-panel p-10 border border-white/5 space-y-6">
                <div className="flex items-center gap-3 mb-2">
                   <Briefcase size={18} className="text-purple-400" />
-                  <h2 className="text-sm font-black text-white uppercase tracking-widest">Asset Specifications</h2>
+                   <h2 className={`text-sm font-black uppercase tracking-widest ${darkMode ? 'text-white' : 'text-primary'}`}>Asset Specifications</h2>
                </div>
                <div>
                   <label className="block text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3">Detailed Manifest</label>
-                  <textarea rows={6} value={description} onChange={(e) => setDescription(e.target.value)} required className="w-full bg-white/[0.03] border border-white/5 rounded-3xl px-8 py-6 text-sm font-medium text-gray-300 focus:outline-none focus:border-accent-blue/50 focus:bg-white/[0.05] transition-all resize-none shadow-inner" placeholder="Enter full unit capability data..." />
+                   <textarea rows={6} value={description} onChange={(e) => setDescription(e.target.value)} required className={`w-full border rounded-3xl px-8 py-6 text-sm font-medium focus:outline-none transition-all resize-none shadow-inner ${darkMode ? 'bg-white/[0.03] border-white/5 text-gray-300 focus:border-accent/50 focus:bg-white/[0.05]' : 'bg-white border-border text-primary focus:border-primary'}`} placeholder="Enter full unit capability data..." />
                </div>
             </div>
 
