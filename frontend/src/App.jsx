@@ -7,6 +7,7 @@ import Products from './pages/Products';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
 import Wishlist from './pages/Wishlist';
+import Compare from './pages/Compare';
 import Auth from './pages/Auth';
 import Checkout from './pages/Checkout';
 import Profile from './pages/Profile';
@@ -22,13 +23,16 @@ import OrderDetails from './pages/admin/OrderDetails';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { CompareProvider } from './context/CompareContext';
 
 const AppContent = () => {
   const location = useLocation();
+  const { darkMode } = useTheme();
   const isAuthPage = ['/login', '/signup'].includes(location.pathname);
 
   return (
-    <div className="min-h-screen flex flex-col bg-dark-bg text-dark-text" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div className={`min-h-screen flex flex-col transition-colors duration-500 ${darkMode ? 'bg-slate-950 text-white' : 'bg-white text-primary'}`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {!isAuthPage && <Navbar />}
 
       <main className="flex-grow">
@@ -38,6 +42,7 @@ const AppContent = () => {
           <Route path="/categories" element={<Products />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/compare" element={<Compare />} />
           <Route path="/checkout" element={
             <ProtectedRoute>
               <Checkout />
@@ -93,15 +98,19 @@ const AppContent = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <WishlistProvider>
-          <Router>
-            <AppContent />
-          </Router>
-        </WishlistProvider>
-      </CartProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <CompareProvider>
+              <Router>
+                <AppContent />
+              </Router>
+            </CompareProvider>
+          </WishlistProvider>
+        </CartProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Star, Loader2, ShoppingCart, ShieldCheck, Truck, RotateCcw, Headphones, ChevronLeft, ChevronRight, Zap, CheckCircle2, Globe } from 'lucide-react';
+import { ArrowRight, Star, Loader2, ShoppingCart, ShieldCheck, Truck, RotateCcw, Headphones, ChevronLeft, ChevronRight, Zap, CheckCircle2, Globe, Cpu } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import ProductCard3D from '../components/ProductCard3D';
 import { categories } from '../data/products';
 import { useCart } from '../context/CartContext';
+import { useTheme } from '../context/ThemeContext';
+import { BannerSkeleton, ProductSkeleton } from '../components/Skeleton';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -13,6 +15,7 @@ const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState({ h: 12, m: 34, s: 56 });
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -40,10 +43,12 @@ const Home = () => {
     return () => clearInterval(timer);
   }, []);
 
+  if (loading) return <BannerSkeleton />;
+
   return (
-    <div className="flex flex-col bg-white overflow-x-hidden pt-24">
+    <div className={`flex flex-col overflow-x-hidden pt-24 transition-colors duration-500 ${darkMode ? 'bg-slate-950 text-white' : 'bg-white text-primary'}`}>
       {/* ========== HERO SECTION - Myntra Style Big Banner ========== */}
-      <section id="hero-banner" className="relative lg:min-h-[850px] w-full overflow-hidden bg-bg-alt flex items-center py-20 lg:py-0">
+      <section id="hero-banner" className={`relative lg:min-h-[850px] w-full overflow-hidden flex items-center py-20 lg:py-0 ${darkMode ? 'bg-slate-900 border-b border-slate-800' : 'bg-bg-alt'}`}>
         <div className="container mx-auto px-6 h-full flex flex-col lg:flex-row items-center gap-16 relative z-10">
           <div className="max-w-2xl text-center lg:text-left space-y-10">
             <motion.div 
@@ -58,18 +63,18 @@ const Home = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-4xl sm:text-6xl md:text-7xl lg:text-[100px] font-black text-primary uppercase tracking-tighter leading-[0.85]"
+                className={`text-4xl sm:text-6xl md:text-7xl lg:text-[100px] font-black uppercase tracking-tighter leading-[0.85] ${darkMode ? 'text-white' : 'text-primary'}`}
              >
                THE FUTURE <br/>
-               <span className="text-accent italic">UNLOCKED.</span> <br/>
-               <span className="text-text-muted">70% OFF.</span>
+               <span className="text-accent italic leading-none block pt-4">UNLOCKED.</span> <br/>
+               <span className={darkMode ? 'text-slate-800' : 'text-text-muted'}>70% OFF.</span>
              </motion.h1>
  
              <motion.p 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-base lg:text-xl text-text-secondary font-medium max-w-lg leading-relaxed mx-auto lg:mx-0 opacity-80"
+                className={`text-base lg:text-xl font-medium max-w-lg leading-relaxed mx-auto lg:mx-0 opacity-80 ${darkMode ? 'text-slate-400' : 'text-text-secondary'}`}
              >
                Precision engineering meets legendary performance. Upgrade your digital arsenal with our flagship collection.
              </motion.p>
@@ -80,8 +85,8 @@ const Home = () => {
                transition={{ delay: 0.3 }}
                className="flex flex-wrap items-center justify-center lg:justify-start gap-6 pt-6"
             >
-              <Link to="/products" className="btn-primary px-12! py-5!">Shop Collection</Link>
-              <Link to="/categories" className="btn-outline px-12! py-5!">Categories</Link>
+              <Link to="/products" className="btn-primary !px-12 !py-5">Shop Collection</Link>
+              <Link to="/categories" className={`btn-outline !px-12 !py-5 ${darkMode ? 'border-slate-800 text-white hover:bg-slate-800' : ''}`}>Categories</Link>
             </motion.div>
           </div>
 
@@ -186,20 +191,46 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ========== BRAND MARQUEE - Professional Retail Feature ========== */}
-      <section className="py-20 bg-white border-y border-border overflow-hidden">
-         <div className="container mx-auto px-6 mb-12 flex items-center justify-between">
-            <h3 className="text-xs font-black uppercase tracking-[0.5em] text-text-muted">Trusted Global Partners</h3>
-            <div className="h-px grow mx-12 bg-border hidden sm:block"></div>
-            <Globe size={18} className="text-text-muted opacity-30" />
-         </div>
-         <div className="flex gap-16 whitespace-nowrap animate-marquee px-6">
-            {['Apple', 'Samsung', 'Sony', 'Dell', 'Bose', 'Logitech', 'Asus', 'HP', 'Razer', 'Canon', 'Nikon', 'Microsoft'].map((brand, i) => (
-              <span key={i} className="text-4xl md:text-5xl font-black text-primary/5 uppercase tracking-tighter hover:text-accent/20 transition-colors cursor-default select-none">{brand}</span>
-            ))}
-            {['Apple', 'Samsung', 'Sony', 'Dell', 'Bose', 'Logitech', 'Asus', 'HP', 'Razer', 'Canon', 'Nikon', 'Microsoft'].map((brand, i) => (
-              <span key={i+100} className="text-4xl md:text-5xl font-black text-primary/5 uppercase tracking-tighter hover:text-accent/20 transition-colors cursor-default select-none">{brand}</span>
-            ))}
+      {/* ========== ELITE SERVICE ECOSYSTEM - Trust Signals ========== */}
+      <section className={`py-24 px-6 border-y border-border ${darkMode ? 'bg-slate-900/50' : 'bg-slate-50/50'}`}>
+         <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+               {[
+                 { 
+                   icon: <Globe size={32} className="text-accent" />, 
+                   title: "GLOBAL WARRANTY", 
+                   desc: "International coverage on all flagship electronics." 
+                 },
+                 { 
+                   icon: <Truck size={32} className="text-accent" />, 
+                   title: "EXPRESS LOGISTICS", 
+                   desc: "Guaranteed next-day delivery on premium inventory." 
+                 },
+                 { 
+                   icon: <ShieldCheck size={32} className="text-accent" />, 
+                   title: "ELITE SECURITY", 
+                   desc: "Advanced 256-bit encryption for every transaction." 
+                 },
+                 { 
+                   icon: <Cpu size={32} className="text-accent" />, 
+                   title: "EXPERT SUPPORT", 
+                   desc: "24/7 technical assistance from certified engineers." 
+                 }
+               ].map((feature, i) => (
+                 <motion.div 
+                   key={i}
+                   initial={{ opacity: 0, y: 20 }}
+                   whileInView={{ opacity: 1, y: 0 }}
+                   viewport={{ once: true }}
+                   transition={{ delay: i * 0.1 }}
+                   className={`p-8 rounded-2xl border border-border transition-all duration-500 group hover:border-accent hover:shadow-2xl hover:shadow-accent/5 ${darkMode ? 'bg-white/5 backdrop-blur-sm' : 'bg-white'}`}
+                 >
+                    <div className="mb-6 transform group-hover:scale-110 transition-transform duration-500">{feature.icon}</div>
+                    <h4 className={`text-sm font-black tracking-[0.2em] mb-3 ${darkMode ? 'text-white' : 'text-primary'}`}>{feature.title}</h4>
+                    <p className="text-text-muted text-sm leading-relaxed">{feature.desc}</p>
+                 </motion.div>
+               ))}
+            </div>
          </div>
       </section>
 

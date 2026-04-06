@@ -18,6 +18,24 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [createdOrder, setCreatedOrder] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [isValidPromo, setIsValidPromo] = useState(null);
+
+  const applyPromo = () => {
+    if (promoCode.toUpperCase() === 'TECH70') {
+      setDiscount(prices.itemsPrice * 0.7);
+      setIsValidPromo(true);
+    } else if (promoCode.toUpperCase() === 'WELCOME10') {
+      setDiscount(prices.itemsPrice * 0.1);
+      setIsValidPromo(true);
+    } else {
+      setDiscount(0);
+      setIsValidPromo(false);
+    }
+  };
+
+  const discountedTotal = Math.max(0, prices.totalPrice - discount);
 
   const steps = [
     { id: 1, name: 'Shipping Address', icon: Truck },
@@ -56,7 +74,8 @@ const Checkout = () => {
         itemsPrice: prices.itemsPrice,
         taxPrice: prices.taxPrice,
         shippingPrice: prices.shippingPrice,
-        totalPrice: prices.totalPrice
+        totalPrice: discountedTotal,
+        discountApplied: discount
       };
 
       const res = await fetch('http://localhost:5001/api/orders', {
@@ -296,22 +315,46 @@ const Checkout = () => {
                    ))}
                 </div>
 
-                <div className="space-y-4 pt-10 border-t border-border">
+                <div className="space-y-4 pt-10 border-t border-border mt-4">
                    <div className="flex justify-between items-center text-[10px] font-black text-text-muted uppercase tracking-widest">
                       <span>Subtotal</span>
                       <span className="text-primary">₹{prices.itemsPrice.toLocaleString()}</span>
                    </div>
+
+                   {/* Promo Selection - Advanced Feature */}
+                   <div className="py-4 border-y border-dashed border-border my-2 space-y-4">
+                      <div className="flex gap-2">
+                         <input 
+                           placeholder="PROMO CODE" 
+                           className="grow bg-white border border-border px-4 py-3 text-[10px] font-black tracking-widest outline-none focus:border-accent uppercase"
+                           value={promoCode}
+                           onChange={(e) => setPromoCode(e.target.value)}
+                         />
+                         <button onClick={applyPromo} className="bg-primary text-white px-6 py-3 text-[10px] font-black tracking-widest hover:bg-accent transition-all">APPLY</button>
+                      </div>
+                      {isValidPromo === true && <p className="text-[9px] font-black text-success uppercase tracking-widest italic">✓ Verified Protocol: Discount Activated</p>}
+                      {isValidPromo === false && <p className="text-[9px] font-black text-danger uppercase tracking-widest italic">⚠ Invalid Authorization Code</p>}
+                   </div>
+
                    <div className="flex justify-between items-center text-[10px] font-black text-text-muted uppercase tracking-widest">
                       <span>GST (18%)</span>
                       <span className="text-primary">₹{prices.taxPrice.toLocaleString()}</span>
                    </div>
+
+                   {discount > 0 && (
+                     <div className="flex justify-between items-center text-[10px] font-black text-accent uppercase tracking-widest">
+                        <span>Promo Savings</span>
+                        <span>- ₹{discount.toLocaleString()}</span>
+                     </div>
+                   )}
+
                    <div className="flex justify-between items-center text-[10px] font-black text-success uppercase tracking-widest">
                       <span>Shipping</span>
                       <span className="rotate-3 italic border border-success px-2 font-black">LEGENDARY FREE</span>
                    </div>
                    <div className="flex justify-between items-center pt-8 border-t border-border mt-4">
                       <span className="text-xs font-black text-primary uppercase tracking-[0.2em] italic underline decoration-4 decoration-accent/20">Grand Total</span>
-                      <span className="text-3xl font-black text-primary tracking-tighter leading-none" style={{ fontFamily: 'Inter' }}>₹{prices.totalPrice.toLocaleString()}</span>
+                      <span className="text-3xl font-black text-primary tracking-tighter leading-none" style={{ fontFamily: 'Inter' }}>₹{discountedTotal.toLocaleString()}</span>
                    </div>
                 </div>
 

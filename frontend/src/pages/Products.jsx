@@ -4,6 +4,8 @@ import { ChevronDown, Search, Loader2, SlidersHorizontal, Sliders, ChevronRight 
 import { useSearchParams, Link } from 'react-router-dom';
 import ProductCard3D from '../components/ProductCard3D';
 import { categories } from '../data/products';
+import { ProductSkeleton } from '../components/Skeleton';
+import { useTheme } from '../context/ThemeContext';
 
 const Products = () => {
   const [searchParams] = useSearchParams();
@@ -17,6 +19,7 @@ const Products = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('latest');
+  const { darkMode } = useTheme();
 
   useEffect(() => { if (searchParam) setSearchQuery(searchParam); }, [searchParam]);
 
@@ -52,35 +55,35 @@ const Products = () => {
   }, [activeCategory, priceRange, searchQuery, allProducts, sortBy]);
 
   return (
-    <div className="pt-32 min-h-screen bg-white">
-      <div className="container mx-auto px-6 pb-24">
+     <div className={`pt-32 min-h-screen transition-colors duration-500 ${darkMode ? 'bg-slate-950 text-white' : 'bg-white'}`}>
+      <div className="container mx-auto px-6 pb-24 max-w-7xl">
         {/* Breadcrumb - Essential for retail */}
-        <div id="breadcrumb" className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-text-muted mb-6">
-           <Link to="/" className="text-primary hover:text-accent transition-colors">Home</Link>
+        <div id="breadcrumb" className={`flex items-center gap-2 text-[12px] font-black uppercase tracking-[.2em] mb-6 ${darkMode ? 'text-slate-500' : 'text-text-muted'}`}>
+           <Link to="/" className="hover:text-accent transition-colors">Home</Link>
            <ChevronRight size={14} strokeWidth={2.5} />
-           <span className="text-accent">Electronic Store</span>
+           <span className="text-accent underline decoration-4 underline-offset-4">Store</span>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-12 pt-6">
           {/* Myntra style professional sidebar filters */}
-          <aside className="lg:w-[260px] lg:sticky lg:top-32 h-fit space-y-10 shrink-0">
-            <div className="pb-4 border-b border-border flex items-center justify-between">
-               <h2 className="text-lg font-bold text-primary uppercase tracking-tighter">Filters</h2>
-               <Sliders size={18} className="text-primary" />
+           <aside className="lg:w-[260px] lg:sticky lg:top-32 h-fit space-y-10 shrink-0">
+            <div className={`pb-4 border-b flex items-center justify-between ${darkMode ? 'border-slate-800' : 'border-border'}`}>
+               <h2 className="text-lg font-black uppercase tracking-tighter">Filters</h2>
+               <Sliders size={18} className="text-accent" />
             </div>
 
             {/* Categories */}
-            <div>
-              <p className="text-xs font-black text-primary uppercase tracking-widest mb-5">Categories</p>
+            <div className="pt-4">
+              <p className={`text-[10px] font-black uppercase tracking-[0.3em] mb-5 ${darkMode ? 'text-slate-500' : 'text-primary'}`}>Categories</p>
               <div className="space-y-3">
                 <button 
                   onClick={() => setActiveCategory('all')}
                   className="flex items-center gap-3 w-full group"
                 >
-                  <div className={`w-4 h-4 border-2 rounded-sm flex items-center justify-center transition-all ${activeCategory === 'all' ? 'border-accent bg-accent' : 'border-border'}`}>
+                  <div className={`w-4 h-4 border-2 rounded-sm flex items-center justify-center transition-all ${activeCategory === 'all' ? 'border-accent bg-accent' : (darkMode ? 'border-slate-800' : 'border-border')}`}>
                     {activeCategory === 'all' && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
                   </div>
-                  <span className={`text-[12px] font-bold uppercase tracking-widest transition-colors ${activeCategory === 'all' ? 'text-accent' : 'text-text-secondary group-hover:text-primary'}`}>All</span>
+                  <span className={`text-[11px] font-black uppercase tracking-widest transition-colors ${activeCategory === 'all' ? 'text-accent' : (darkMode ? 'text-slate-400 group-hover:text-white' : 'text-text-secondary group-hover:text-primary')}`}>All</span>
                 </button>
                 {categories.map(cat => (
                   <button 
@@ -88,40 +91,38 @@ const Products = () => {
                     onClick={() => setActiveCategory(cat.id)}
                     className="flex items-center gap-3 w-full group"
                   >
-                    <div className={`w-4 h-4 border-2 rounded-sm flex items-center justify-center transition-all ${activeCategory === cat.id ? 'border-accent bg-accent' : 'border-border'}`}>
+                    <div className={`w-4 h-4 border-2 rounded-sm flex items-center justify-center transition-all ${activeCategory === cat.id ? 'border-accent bg-accent' : (darkMode ? 'border-slate-800' : 'border-border')}`}>
                       {activeCategory === cat.id && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
                     </div>
-                    <span className={`text-[12px] font-bold uppercase tracking-widest transition-colors ${activeCategory === cat.id ? 'text-accent' : 'text-text-secondary group-hover:text-primary'}`}>{cat.name}</span>
+                    <span className={`text-[11px] font-black uppercase tracking-widest transition-colors ${activeCategory === cat.id ? 'text-accent' : (darkMode ? 'text-slate-400 group-hover:text-white' : 'text-text-secondary group-hover:text-primary')}`}>{cat.name}</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Price section */}
             <div className="pt-4">
-              <p className="text-xs font-black text-primary uppercase tracking-widest mb-5">Price Range</p>
+              <p className={`text-[10px] font-black uppercase tracking-[0.3em] mb-5 ${darkMode ? 'text-slate-500' : 'text-primary'}`}>Price Range</p>
               <div className="px-1 space-y-4">
                 <input 
                    type="range" min="0" max="5000" step="100" 
                    value={priceRange} 
                    onChange={(e) => setPriceRange(Number(e.target.value))}
-                   className="w-full accent-accent h-1 bg-border rounded-lg appearance-none cursor-pointer"
+                   className="w-full accent-accent h-1 bg-border dark:bg-slate-800 rounded-lg appearance-none cursor-pointer"
                 />
-                <div className="flex justify-between items-center bg-bg-alt px-4 py-2 rounded-sm">
+                <div className={`flex justify-between items-center px-4 py-2 rounded-sm border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-bg-alt border-border/5'}`}>
                    <span className="text-[10px] font-black text-text-muted">₹0</span>
-                   <span className="text-sm font-black text-primary tracking-tighter">₹{priceRange.toLocaleString()}</span>
+                   <span className={`text-sm font-black tracking-tighter ${darkMode ? 'text-white' : 'text-primary'}`}>₹{priceRange.toLocaleString()}</span>
                 </div>
               </div>
             </div>
 
-            {/* Brands dummy section for UI */}
             <div className="pt-4">
-              <p className="text-xs font-black text-primary uppercase tracking-widest mb-5">Brands</p>
-              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 no-scrollbar">
+              <p className={`text-[10px] font-black uppercase tracking-[0.3em] mb-5 ${darkMode ? 'text-slate-500' : 'text-primary'}`}>Fabricators</p>
+              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 no-scrollbar">
                 {['Sony', 'Bose', 'Apple', 'Sennheiser', 'Samsung', 'Beats', 'LG'].map(brand => (
                   <div key={brand} className="flex items-center gap-3 group cursor-pointer">
-                    <div className="w-4 h-4 border-2 border-border rounded-sm group-hover:border-accent"></div>
-                    <span className="text-[11px] font-bold uppercase tracking-widest text-text-secondary group-hover:text-primary transition-colors">{brand}</span>
+                    <div className={`w-4 h-4 border-2 rounded-sm transition-all group-hover:border-accent ${darkMode ? 'border-slate-800' : 'border-border'}`}></div>
+                    <span className={`text-[11px] font-black uppercase tracking-widest transition-colors ${darkMode ? 'text-slate-400 group-hover:text-white' : 'text-text-secondary group-hover:text-primary'}`}>{brand}</span>
                   </div>
                 ))}
               </div>
@@ -129,7 +130,7 @@ const Products = () => {
 
             <button 
               onClick={() => { setActiveCategory('all'); setPriceRange(5000); setSearchQuery(''); setSortBy('latest'); }}
-              className="w-full py-3 mt-6 border border-border text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:bg-slate-50 transition-all font-bold"
+              className={`w-full py-3 mt-6 border text-[10px] font-black uppercase tracking-[0.2em] transition-all ${darkMode ? 'border-slate-800 text-slate-400 hover:bg-slate-900' : 'border-border text-primary hover:bg-slate-50'}`}
             >
               Clear All Filters
             </button>
@@ -161,9 +162,8 @@ const Products = () => {
             </div>
 
             {loading ? (
-              <div className="flex flex-col items-center justify-center py-40">
-                <Loader2 className="w-12 h-12 text-accent animate-spin mb-4" />
-                <p className="text-xs font-black uppercase tracking-widest text-text-muted">Loading Electronics...</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-x-8 gap-y-12">
+                   {[...Array(8)].map((_, i) => <ProductSkeleton key={i} />)}
               </div>
             ) : (
               <AnimatePresence mode="popLayout">
