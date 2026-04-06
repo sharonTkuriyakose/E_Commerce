@@ -79,4 +79,30 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-export { getProducts, getProductById, createProduct, updateProduct, deleteProduct };
+// @desc    Create new review
+// @route   POST /api/products/:id/reviews
+// @access  Public (simplified for this project, ideally Private)
+const createProductReview = async (req, res) => {
+  const { rating, comment, name } = req.body;
+
+  const product = await Product.findById(req.params.id);
+
+  if (product) {
+    const review = {
+      name: name || 'Anonymous',
+      rating: Number(rating),
+      comment,
+    };
+
+    product.reviews.push(review);
+    product.numReviews = product.reviews.length;
+    product.rating = product.reviews.reduce((acc, item) => item.rating + acc, 0) / product.reviews.length;
+
+    await product.save();
+    res.status(201).json({ message: 'Review added' });
+  } else {
+    res.status(404).json({ message: 'Product not found' });
+  }
+};
+
+export { getProducts, getProductById, createProduct, updateProduct, deleteProduct, createProductReview };

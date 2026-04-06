@@ -1,13 +1,15 @@
 import React from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Heart, ShoppingBag, Star } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
 
 const ProductCard3D = ({ product }) => {
+  const navigate = useNavigate();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { addToCart } = useCart();
+  
   // Keeping subtle 3D but standard retail look
   const x = useMotionValue(0);
   const y = useMotionValue(0);

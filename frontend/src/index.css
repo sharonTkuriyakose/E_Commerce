@@ -139,3 +139,27 @@ html {
 .hr-myntra {
   @apply border-t border-border my-6;
 }
+
+/* Flagship Animations */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+.glass-card {
+  @apply bg-white/70 backdrop-blur-md border border-white/20;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #d4af37 0%, #f9f295 50%, #d4af37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.shadow-premium {
+  box-shadow: 0 50px 100px -20px rgba(50, 50, 93, 0.25), 0 30px 60px -30px rgba(0, 0, 0, 0.3);
+}

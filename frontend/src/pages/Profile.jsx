@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { ShieldCheck, Calendar, Activity, Check, ArrowRight, Package, User, ShoppingBag } from 'lucide-react';
+import { ShieldCheck, Calendar, Activity, Check, ArrowRight, Package, User, ShoppingBag, Truck, CheckCircle2, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Profile = () => {
@@ -51,8 +51,8 @@ const Profile = () => {
              className="lg:col-span-2 space-y-8"
            >
              <div>
-               <div className="text-[11px] font-black uppercase tracking-[0.5em] text-accent opacity-70 italic mb-4">Personnel Intelligence</div>
-               <h1 className="text-6xl md:text-8xl font-black text-primary tracking-tighter uppercase italic leading-none">
+               <div className="text-[11px] font-black uppercase tracking-[0.5em] text-accent opacity-70 mb-4">Personnel Intelligence</div>
+               <h1 className="text-6xl md:text-8xl font-black text-primary tracking-tighter uppercase leading-none">
                  User <span className="text-accent underline decoration-8 underline-offset-8">Profile</span>
                </h1>
                <div className="flex flex-wrap items-center gap-6 mt-10">
@@ -74,84 +74,106 @@ const Profile = () => {
              transition={{ delay: 0.2 }}
              className="bg-slate-50 p-10 border border-border rounded-sm flex flex-col justify-center"
            >
-              <div className="text-[10px] font-black text-text-muted uppercase tracking-[0.4em] mb-4 italic">Total Acquisitions</div>
-              <div className="text-7xl font-black text-primary tracking-tighter italic leading-none">{orders.length}</div>
-              <p className="text-xs text-text-muted font-medium italic mt-6 opacity-80 leading-relaxed">Global acquisitions across all tech sectors.</p>
+              <div className="text-[10px] font-black text-text-muted uppercase tracking-[0.4em] mb-4">Total Acquisitions</div>
+              <div className="text-7xl font-black text-primary tracking-tighter leading-none">{orders.length}</div>
+              <p className="text-xs text-text-muted font-medium mt-6 opacity-80 leading-relaxed">Global acquisitions across all tech sectors.</p>
            </motion.div>
         </div>
 
         {/* Orders Archive */}
         <div className="space-y-12 pt-10 border-t border-border">
            <div className="flex items-center justify-between px-3">
-              <h2 className="text-3xl font-black text-primary uppercase italic tracking-tighter leading-none">Acquisition <span className="text-accent underline decoration-4 underline-offset-8">Logs</span></h2>
+              <h2 className="text-3xl font-black text-primary uppercase tracking-tighter leading-none">Acquisition <span className="text-accent underline decoration-4 underline-offset-8">Logs</span></h2>
               <div className="text-[10px] font-black text-text-muted uppercase tracking-[0.4em]">Historical Log Data</div>
            </div>
 
            {error ? (
-             <div className="p-10 rounded-sm bg-red-500/5 border border-red-500/20 text-red-500 text-center uppercase tracking-[0.3em] text-[10px] font-black italic">
+             <div className="p-10 rounded-sm bg-red-500/5 border border-red-500/20 text-red-500 text-center uppercase tracking-[0.3em] text-[10px] font-black">
                SECURE ARCHIVE ACCESS DENIED: {error}
              </div>
            ) : orders.length === 0 ? (
              <div className="group relative p-20 rounded-sm bg-slate-50 border border-border flex flex-col items-center justify-center space-y-10 overflow-hidden">
                 <ShoppingBag size={80} className="text-primary/5 group-hover:text-accent/20 transition-all duration-700 transform group-hover:rotate-12" />
                 <div className="text-center space-y-4">
-                   <h3 className="text-2xl font-black text-primary uppercase italic tracking-tighter opacity-30">Log Database Empty</h3>
-                   <p className="text-xs text-text-muted font-medium italic tracking-widest max-w-xs leading-relaxed mx-auto">No payload transfers have been authorized for this operator yet. Initialize a tech acquisition to generate logs.</p>
+                   <h3 className="text-2xl font-black text-primary uppercase tracking-tighter opacity-30">Log Database Empty</h3>
+                   <p className="text-xs text-text-muted font-medium tracking-widest max-w-xs leading-relaxed mx-auto">No payload transfers have been authorized for this operator yet. Initialize a tech acquisition to generate logs.</p>
                 </div>
                 <Link to="/products" className="btn-primary px-16! py-6! rounded-sm! tracking-[0.3em]! shadow-2xl shadow-accent/20">START ACQUISITION</Link>
              </div>
            ) : (
-             <div className="grid grid-cols-1 gap-10">
+             <div className="grid grid-cols-1 gap-12">
                 {orders.map((order, i) => (
                   <motion.div
                     key={order._id}
                     initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
                     transition={{ delay: i * 0.1 }}
-                    className="group relative rounded-sm bg-white border border-border hover:border-accent transition-all duration-500 hover:shadow-2xl hover:shadow-accent/5 overflow-hidden"
+                    className="group relative rounded-sm bg-white border border-border hover:border-accent transition-all duration-500 hover:shadow-2xl hover:shadow-accent/5"
                   >
-                     <div className="p-10 flex flex-col md:flex-row items-center justify-between gap-12">
-                        <div className="grow space-y-8">
-                           <div className="flex items-center gap-10">
-                              <div className="w-20 h-20 bg-slate-50 border border-border flex items-center justify-center group-hover:bg-accent/10 transition-all duration-500 rounded-sm">
-                                <Package size={32} className="text-primary opacity-40 group-hover:text-accent" />
+                     <div className="p-8 md:p-12 flex flex-col gap-12">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-8 pb-10 border-b border-border">
+                           <div className="flex items-center gap-8">
+                              <div className="w-16 h-16 bg-slate-50 border border-border flex items-center justify-center group-hover:bg-accent/10 transition-all duration-500 rounded-sm">
+                                <Package size={28} className="text-primary opacity-40 group-hover:text-accent" />
                               </div>
-                              <div className="space-y-2">
-                                 <div className="text-[10px] font-black text-text-muted uppercase tracking-[0.4em] italic mb-1">Payload Hash</div>
-                                 <div className="text-2xl font-black text-primary italic tracking-tighter transition-all uppercase underline decoration-accent/10">#{order._id.substring(order._id.length - 12)}</div>
+                              <div className="space-y-1">
+                                 <div className="text-[10px] font-black text-text-muted uppercase tracking-[0.4em] mb-1">Payload Hash</div>
+                                 <div className="text-xl font-black text-primary tracking-tighter uppercase underline decoration-accent/10">#{order._id.substring(order._id.length - 12)}</div>
                               </div>
                            </div>
                            
-                           <div className="flex flex-wrap gap-4">
-                              {order.orderItems.map((item, idx) => (
-                                <div key={idx} className="bg-slate-50 border border-border px-5 py-3 flex items-center gap-4 group-hover:border-accent/40 transition-colors rounded-sm">
-                                  <div className="w-8 h-8 rounded-full bg-white border border-border flex items-center justify-center text-[10px] font-black shrink-0">x{item.quantity}</div>
-                                  <span className="text-[12px] font-black text-primary uppercase italic truncate max-w-[250px]">{item.name}</span>
-                                </div>
-                              ))}
-                           </div>
-
-                           <div className="flex items-center gap-8 pt-4">
-                              <div className="flex items-center gap-3 text-text-muted bg-slate-50 px-4 py-2 rounded-sm border border-transparent group-hover:border-border">
-                                 <Calendar size={14} className="opacity-60" />
-                                 <span className="text-[10px] font-black uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                           <div className="flex items-center gap-10">
+                              <div className="text-center">
+                                 <p className="text-[9px] font-black text-text-muted uppercase tracking-[0.4em] mb-1">Acquired On</p>
+                                 <p className="text-xs font-black text-primary uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString()}</p>
                               </div>
-                              <div className="text-[12px] font-black text-primary uppercase tracking-[0.3em] italic border-b-2 border-accent">₹{order.totalPrice.toLocaleString()}</div>
+                              <div className="text-right">
+                                 <p className="text-[9px] font-black text-text-muted uppercase tracking-[0.4em] mb-1">Total Value</p>
+                                 <p className="text-[18px] font-black text-accent uppercase tracking-tighter leading-none">₹{order.totalPrice.toLocaleString()}</p>
+                              </div>
                            </div>
                         </div>
 
-                        <div className="flex flex-col items-center md:items-end gap-10 min-w-[200px]">
-                           <div className="flex flex-col items-center md:items-end">
-                              <div className="text-[9px] font-black text-text-muted uppercase tracking-[0.4em] mb-4 italic">Authorization Status</div>
-                              {order.isDelivered ? (
-                                <div className="flex items-center gap-3 px-8 py-3 rounded-sm bg-emerald-500 text-white text-[10px] font-black uppercase tracking-[0.3em] shadow-lg shadow-emerald-500/20">
-                                  COMPLETED
+                        {/* ADVANCED TRACKING TIMELINE - Premium Feature */}
+                        <div className="space-y-6">
+                           <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.5em] mb-8">Acquisition Timeline</h4>
+                           <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-10">
+                              {/* Connector Line */}
+                              <div className="absolute top-4 left-4 md:left-0 md:top-1/2 w-0.5 h-full md:w-full md:h-0.5 bg-slate-100 -z-10">
+                                 <div className={`h-full md:h-full bg-success transition-all duration-1000 ${order.isDelivered ? 'w-full' : 'w-2/3'}`}></div>
+                              </div>
+
+                              {[
+                                { label: 'ORDER PLACED', icon: CheckCircle2, status: 'completed', time: '10:30 AM' },
+                                { label: 'PROCESSING', icon: Clock, status: 'completed', time: '11:45 AM' },
+                                { label: 'IN TRANSIT', icon: Truck, status: order.isDelivered ? 'completed' : 'active', time: order.isDelivered ? '02:00 PM' : 'PENDING' },
+                                { label: 'DELIVERED', icon: ShieldCheck, status: order.isDelivered ? 'completed' : 'upcoming', time: order.isDelivered ? 'ARRIVED' : 'EST. 2 DAYS' }
+                              ].map((step, idx) => (
+                                <div key={idx} className="flex md:flex-col items-center gap-6 md:gap-4 relative z-10">
+                                   <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 bg-white transition-all duration-500 ${
+                                     step.status === 'completed' ? 'border-success text-success shadow-lg shadow-success/20 scale-110' : 
+                                     step.status === 'active' ? 'border-accent text-accent animate-pulse' : 'border-slate-200 text-slate-300'
+                                   }`}>
+                                      <step.icon size={18} strokeWidth={2.5} />
+                                   </div>
+                                   <div className="flex flex-col md:items-center text-left md:text-center space-y-1">
+                                      <span className={`text-[9px] font-black uppercase tracking-[0.4em] ${step.status === 'upcoming' ? 'text-slate-300' : 'text-primary'}`}>{step.label}</span>
+                                      <span className="text-[8px] font-black text-text-muted uppercase tracking-widest">{step.time}</span>
+                                   </div>
                                 </div>
-                              ) : (
-                                <div className="flex items-center gap-3 px-8 py-3 rounded-sm bg-amber-500/10 text-amber-600 border border-amber-500/20 text-[10px] font-black uppercase tracking-[0.4em] italic shadow-lg shadow-amber-500/5">
-                                  IN TRANSIT
+                              ))}
+                           </div>
+                        </div>
+
+                        <div className="pt-10 border-t border-border mt-4">
+                           <div className="flex flex-wrap gap-4">
+                              {order.orderItems.map((item, idx) => (
+                                <div key={idx} className="bg-slate-50 border border-border px-6 py-4 flex items-center gap-6 rounded-sm">
+                                   <div className="w-10 h-10 rounded-full bg-white border border-border flex items-center justify-center text-[11px] font-black shrink-0">x{item.quantity}</div>
+                                   <span className="text-[13px] font-black text-primary uppercase truncate max-w-[300px]">{item.name}</span>
                                 </div>
-                              )}
+                              ))}
                            </div>
                         </div>
                      </div>

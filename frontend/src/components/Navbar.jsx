@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Heart, Search, User, Menu, X, Settings, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
+import { ShoppingCart, Heart, Search, User, Menu, X, Settings, LogOut, LayoutDashboard, ChevronDown, Mic, MicOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [keyword, setKeyword] = useState('');
+  const [isListening, setIsListening] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { userInfo, logout } = useAuth();
   const { cartItems } = useCart();
+  const { wishlistItems } = useWishlist();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -23,6 +26,28 @@ const Navbar = () => {
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const startVoiceSearch = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Voice search is not supported in this browser.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setKeyword(transcript);
+      navigate(`/products?search=${transcript}`);
+    };
+
+    recognition.start();
   };
 
   const submitHandler = (e) => {
@@ -43,13 +68,13 @@ const Navbar = () => {
     <nav className={`fixed top-0 left-0 w-full z-[100] transition-all bg-white ${isScrolled ? 'shadow-sticky h-20' : 'h-24'}`}>
       <div className="container mx-auto px-6 h-full flex items-center justify-between">
         
-        {/* Brand Logo - clean and professional */}
+        {/* Brand Logo */}
         <Link to="/" className="flex items-center gap-1 sm:gap-2 group shrink-0">
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-md bg-accent flex items-center justify-center font-black text-white text-base sm:text-xl uppercase tracking-tighter" style={{ fontFamily: 'Inter' }}>T</div>
           <span className="text-lg sm:text-2xl font-black tracking-tighter text-primary uppercase" style={{ fontFamily: 'Inter' }}>TECH<span className="text-accent underline decoration-4 underline-offset-4 uppercase ml-1 sm:ml-2">STORE</span></span>
         </Link>
 
-        {/* Categories Link - Myntra style */}
+        {/* Desktop Nav */}
         <div className="hidden lg:flex items-center gap-8 ml-10">
           {navLinks.map((link) => (
             <Link 
@@ -64,7 +89,7 @@ const Navbar = () => {
           ))}
         </div>
 
-        {/* Global Search Bar - The core of retail UI */}
+        {/* Global Search with Voice */}
         <div className="grow max-w-2xl mx-12 hidden md:block">
           <form onSubmit={submitHandler} className="relative">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">
@@ -75,12 +100,19 @@ const Navbar = () => {
               placeholder="Search for products, brands and more"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
-              className="w-full bg-bg-alt border-0 rounded-md pl-12 pr-4 py-3 text-sm focus:bg-white focus:ring-1 focus:ring-border outline-none transition-all placeholder:text-text-muted font-medium hover:shadow-md focus:shadow-3d"
+              className="w-full bg-bg-alt border-0 rounded-md pl-12 pr-12 py-3 text-sm focus:bg-white focus:ring-1 focus:ring-border outline-none transition-all placeholder:text-text-muted font-medium"
             />
+            <button 
+              type="button" 
+              onClick={startVoiceSearch}
+              className={`absolute right-4 top-1/2 -translate-y-1/2 transition-all ${isListening ? 'text-accent animate-pulse' : 'text-text-muted hover:text-primary'}`}
+            >
+              {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+            </button>
           </form>
         </div>
 
-        {/* Actions - Simple and clean icons */}
+        {/* Actions */}
         <div className="flex items-center gap-4 sm:gap-6">
           <div className="hidden lg:flex items-center gap-6 border-r border-border pr-6 mr-1">
             {/* User Account */}
@@ -107,7 +139,7 @@ const Navbar = () => {
                         </>
                      ) : (
                         <div className="space-y-4">
-                           <p className="text-sm font-bold text-primary italic leading-tight">Welcome to the premium retail experience</p>
+                           <p className="text-sm font-bold text-primary leading-tight font-black uppercase tracking-tight">Premium Retail Member</p>
                            <Link to="/login" className="block w-full py-2.5 text-center text-accent border border-border font-bold text-xs uppercase hover:bg-slate-50 transition-colors">Login / Signup</Link>
                         </div>
                      )}
@@ -116,13 +148,20 @@ const Navbar = () => {
             </div>
 
             {/* Wishlist */}
-            <Link to="/wishlist" className="flex flex-col items-center gap-1 group">
-              <Heart size={20} className="text-primary group-hover:text-accent transition-colors" />
+            <Link to="/wishlist" className="flex flex-col items-center gap-1 group relative">
+              <div className="relative">
+                <Heart size={20} className="text-primary group-hover:text-accent transition-colors" />
+                {wishlistItems && wishlistItems.length > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[7px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white">
+                    {wishlistItems.length}
+                  </span>
+                )}
+              </div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary group-hover:text-primary">Wishlist</span>
             </Link>
           </div>
 
-          {/* Cart Icon - Myntra style bag */}
+          {/* Cart Icon */}
           <Link to="/cart" className="flex flex-col items-center gap-1 group relative pb-1">
              <div className="relative">
                 <ShoppingCart size={22} className="text-primary group-hover:text-accent transition-colors" />
