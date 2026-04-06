@@ -9,17 +9,26 @@ import Cart from './pages/Cart';
 import Wishlist from './pages/Wishlist';
 import Auth from './pages/Auth';
 import Checkout from './pages/Checkout';
+import Profile from './pages/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import UserList from './pages/admin/UserList';
+import ProductList from './pages/admin/ProductList';
+import ProductEdit from './pages/admin/ProductEdit';
+import OrderList from './pages/admin/OrderList';
+import OrderDetails from './pages/admin/OrderDetails';
 
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { WishlistProvider } from './context/WishlistContext';
 
 const AppContent = () => {
   const location = useLocation();
   const isAuthPage = ['/login', '/signup'].includes(location.pathname);
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-dark-bg text-white selection:bg-accent-blue selection:text-white">
+    <div className="min-h-screen flex flex-col bg-dark-bg text-dark-text" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {!isAuthPage && <Navbar />}
 
       <main className="flex-grow">
@@ -27,11 +36,7 @@ const AppContent = () => {
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />
           <Route path="/categories" element={<Products />} />
-          <Route path="/product/:id" element={
-            <ProtectedRoute>
-              <ProductDetails />
-            </ProtectedRoute>
-          } />
+          <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={
             <ProtectedRoute>
@@ -41,6 +46,43 @@ const AppContent = () => {
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/login" element={<Auth isLogin={true} />} />
           <Route path="/signup" element={<Auth isLogin={false} />} />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
+
+          {/* Admin Routes */}
+          <Route path="/admin/dashboard" element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          } />
+          <Route path="/admin/users" element={
+            <AdminRoute>
+              <UserList />
+            </AdminRoute>
+          } />
+          <Route path="/admin/products" element={
+            <AdminRoute>
+              <ProductList />
+            </AdminRoute>
+          } />
+          <Route path="/admin/product/:id/edit" element={
+            <AdminRoute>
+              <ProductEdit />
+            </AdminRoute>
+          } />
+          <Route path="/admin/orders" element={
+            <AdminRoute>
+              <OrderList />
+            </AdminRoute>
+          } />
+          <Route path="/admin/orders/:id" element={
+            <AdminRoute>
+              <OrderDetails />
+            </AdminRoute>
+          } />
         </Routes>
       </main>
 
@@ -53,9 +95,11 @@ function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <Router>
-          <AppContent />
-        </Router>
+        <WishlistProvider>
+          <Router>
+            <AppContent />
+          </Router>
+        </WishlistProvider>
       </CartProvider>
     </AuthProvider>
   );

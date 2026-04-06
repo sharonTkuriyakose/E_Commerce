@@ -1,15 +1,29 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState(
-    localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')) : []
-  );
+  const [cartItems, setCartItems] = useState(() => {
+    try {
+      const localData = localStorage.getItem('cartItems');
+      return localData ? JSON.parse(localData) : [];
+    } catch (error) {
+      console.error('Cart state restoration failed:', error);
+      return [];
+    }
+  });
+
+  const { userInfo } = useAuth();
 
   useEffect(() => {
-    localStorage.setItem('cartItems', JSON.stringify(cartItems));
-  }, [cartItems]);
+    if (!userInfo) {
+       setCartItems([]);
+       localStorage.removeItem('cartItems');
+    } else {
+       localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    }
+  }, [cartItems, userInfo]);
 
   const addToCart = (product, quantity = 1) => {
     setCartItems(prev => {

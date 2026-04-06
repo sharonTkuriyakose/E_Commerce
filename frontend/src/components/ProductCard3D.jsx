@@ -1,124 +1,104 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { Heart, ShoppingCart, Star } from 'lucide-react';
+import { Heart, ShoppingBag, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useWishlist } from '../context/WishlistContext';
+import { useCart } from '../context/CartContext';
 
 const ProductCard3D = ({ product }) => {
-  const cardRef = useRef(null);
-  
-  // Motion values for capturing mouse position
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const { addToCart } = useCart();
+  // Keeping subtle 3D but standard retail look
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  // Smooth springs for tilt effect
-  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 20 });
-  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 20 });
+  const mouseXSpring = useSpring(x, { stiffness: 400, damping: 30 });
+  const mouseYSpring = useSpring(y, { stiffness: 400, damping: 30 });
 
-  // Map mouse position to rotation values (tilt effect)
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["5deg", "-5deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-5deg", "5deg"]);
 
-  // Handle mouse move over card
   const handleMouseMove = (e) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    
-    // Calculate mouse position relative to card center (-0.5 to 0.5)
-    const width = rect.width;
-    const height = rect.height;
-    
+    const rect = e.currentTarget.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-    
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
-    
-    x.set(xPct);
-    y.set(yPct);
+    x.set(mouseX / rect.width - 0.5);
+    y.set(mouseY / rect.height - 0.5);
   };
 
-  // Reset rotation when mouse leaves
   const handleMouseLeave = () => {
     x.set(0);
     y.set(0);
   };
 
-  // Generate fake rating array
-  const renderStars = (rating) => {
-    return Array.from({ length: 5 }).map((_, idx) => (
-      <Star 
-        key={idx} 
-        size={14} 
-        className={idx < Math.floor(rating) ? "text-accent-blue fill-accent-blue" : "text-gray-600"} 
-      />
-    ));
-  };
+  const discountedPrice = product.price * 0.8; // Example discount calculation for UI
 
   return (
-    <Link to={`/product/${product._id || product.id}`} className="block perspective-1000 z-10 w-full h-full">
+    <Link to={`/product/${product._id || product.id}`} className="block h-full group relative overflow-visible perspective-1000">
       <motion.div
-        ref={cardRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        style={{
-          rotateX,
-          rotateY,
-          transformStyle: "preserve-3d",
-        }}
-        whileHover={{ scale: 1.02, y: -5 }}
-        transition={{ duration: 0.2 }}
-        className="relative group h-full glass-panel border border-glass-border/40 p-5 flex flex-col hover:border-accent-blue/50 transition-colors duration-300 before:absolute before:inset-0 before:bg-gradient-to-b before:from-transparent before:to-accent-blue/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:rounded-2xl"
+        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+        className="product-card-ui h-full flex flex-col p-0 relative shadow-3d-hover transition-all duration-300"
       >
-        {/* Wishlist Icon */}
-        <button 
-          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-dark-bg/60 border border-glass-border flex items-center justify-center text-gray-400 hover:text-accent-blue hover:border-accent-blue/50 transition-all backdrop-blur-md"
-          onClick={(e) => {
-            e.preventDefault();
-            // Wishlist logic
-          }}
-        >
-          <Heart size={16} />
-        </button>
-
-        {/* Product Image with pop-out depth */}
-        <div 
-          className="relative w-full h-48 mb-6 flex items-center justify-center translate-z-10"
-          style={{ transform: "translateZ(30px)" }}
-        >
-          {/* subtle glow behind image */}
-          <div className="absolute inset-0 bg-accent-blue/10 blur-xl rounded-full scale-75 group-hover:bg-accent-blue/20 transition-colors duration-500"></div>
+        {/* Product Image - Light Gray background for contrast */}
+        <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-50">
           <img 
             src={product.image} 
             alt={product.name} 
-            className="relative z-10 max-h-full object-contain drop-shadow-2xl group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-full object-contain p-6 mix-blend-multiply group-hover:scale-105 transition-transform duration-700"
           />
+          
+          {/* Wishlist Button - Top Right */}
+          <button 
+            className={`absolute top-4 right-4 w-9 h-9 rounded-full bg-white/80 shadow-sm border border-border flex items-center justify-center transition-all scale-100 group-hover:scale-100 duration-200 z-20 ${isInWishlist(product._id) ? 'text-accent' : 'text-primary'}`}
+            onClick={(e) => { 
+                e.preventDefault(); 
+                e.stopPropagation();
+                toggleWishlist(product); 
+            }}
+          >
+            <Heart 
+                size={16} 
+                strokeWidth={2.5} 
+                className={`${isInWishlist(product._id) ? 'fill-accent text-accent' : 'hover:text-accent'}`} 
+            />
+          </button>
+
+          {/* Rating Badge */}
+          <div className="absolute bottom-4 left-4 inline-flex items-center gap-1.5 px-2 py-1 rounded-sm bg-white/90 shadow-sm text-primary font-bold text-[10px] border border-border">
+            <span>{product.rating}</span>
+            <Star size={10} className="fill-success text-success" />
+            <span className="text-text-muted border-l border-border pl-1.5">{product.numReviews || 12} reviews</span>
+          </div>
+
+          {/* ADD TO BAG - Myntra style action */}
+          <div className="absolute bottom-4 right-4 left-4 z-10 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+              <button 
+                 onClick={(e) => {
+                     e.preventDefault();
+                     e.stopPropagation();
+                     addToCart(product);
+                     navigate('/cart');
+                 }}
+                 className="w-full bg-white border border-border py-2.5 rounded-sm shadow-xl flex items-center justify-center gap-3 text-[11px] font-black uppercase text-primary hover:bg-slate-50"
+             >
+                 ORDER NOW
+              </button>
+          </div>
         </div>
 
         {/* Product Info */}
-        <div className="flex-grow flex flex-col" style={{ transform: "translateZ(20px)" }}>
-          <div className="text-xs font-medium text-accent-blue mb-1 truncate">{product.category.toUpperCase()}</div>
-          <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 leading-tight group-hover:text-accent-blue transition-colors">{product.name}</h3>
+        <div className="p-4 pt-5 space-y-1.5">
+          <h3 className="text-sm font-bold text-primary tracking-tight leading-tight group-hover:text-accent transition-colors line-clamp-1">
+            {product.name}
+          </h3>
+          <p className="text-xs text-text-muted line-clamp-1">Premium Series · {product.category || 'Gear'}</p>
           
-          <div className="flex items-center space-x-1 mb-4">
-            {renderStars(product.rating)}
-            <span className="text-xs text-gray-400 ml-2">({(Math.random() * 200 + 50).toFixed(0)})</span>
-          </div>
-
-          <div className="mt-auto flex items-end justify-between">
-            <div className="text-2xl font-black text-white">
-              <span className="text-sm align-top text-gray-400 mr-1">₹</span>
-              {product.price.toLocaleString()}
-            </div>
-            
-            <button 
-              className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 border border-glass-border text-white hover:bg-accent-blue hover:border-accent-blue hover:text-dark-bg transition-all duration-300 group-hover:shadow-[0_0_15px_rgba(0,240,255,0.4)]"
-              onClick={(e) => {
-                e.preventDefault();
-                // Add to cart
-              }}
-            >
-              <ShoppingCart size={18} />
-            </button>
+          <div className="flex items-center gap-2 pt-1">
+            <span className="text-sm font-bold text-primary">₹{Math.floor(discountedPrice).toLocaleString()}</span>
+            <span className="text-[11px] text-text-muted line-through">₹{product.price.toLocaleString()}</span>
+            <span className="text-[11px] text-warning font-bold">(20% OFF)</span>
           </div>
         </div>
       </motion.div>

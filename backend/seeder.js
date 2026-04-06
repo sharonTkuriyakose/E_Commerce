@@ -25,7 +25,67 @@ const importData = async () => {
     await Product.deleteMany();
     await User.deleteMany();
 
-    await Product.insertMany(products);
+    // Create Admin User
+    const adminUser = await User.create({
+      name: 'Admin User',
+      email: 'admin@example.com',
+      password: 'password123',
+      isAdmin: true,
+    });
+
+    // Create Regular User
+    const regularUser = await User.create({
+      name: 'Regular User',
+      email: 'user@example.com',
+      password: 'password123',
+      isAdmin: false,
+    });
+
+    const sampleProducts = products.map((product) => {
+      return { ...product, user: adminUser._id };
+    });
+
+    const createdProducts = await Product.insertMany(sampleProducts);
+
+    // Create Sample Orders
+    const orderItems = [
+      {
+        name: createdProducts[0].name,
+        quantity: 1,
+        image: createdProducts[0].image,
+        price: createdProducts[0].price,
+        product: createdProducts[0]._id,
+      },
+      {
+        name: createdProducts[1].name,
+        quantity: 1,
+        image: createdProducts[1].image,
+        price: createdProducts[1].price,
+        product: createdProducts[1]._id,
+      },
+    ];
+
+    const totalPrice = createdProducts[0].price + createdProducts[1].price + 25.0;
+
+    const sampleOrder = {
+      user: regularUser._id,
+      orderItems,
+      shippingAddress: {
+        address: '123 Main St',
+        city: 'New York',
+        postalCode: '10001',
+        country: 'USA',
+      },
+      paymentMethod: 'PayPal',
+      taxPrice: 15.0,
+      shippingPrice: 10.0,
+      totalPrice: totalPrice,
+      isPaid: true,
+      paidAt: Date.now(),
+      isDelivered: false,
+    };
+
+    await Order.create(sampleOrder);
 
     console.log('Data Imported Successfully!');
     process.exit();

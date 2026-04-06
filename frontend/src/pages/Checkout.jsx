@@ -1,369 +1,339 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CreditCard, Truck, CheckCircle2, ChevronRight, Lock, Wallet, Smartphone, Banknote } from 'lucide-react';
+import { CreditCard, Truck, CheckCircle2, Lock, Wallet, Smartphone, Banknote, ShieldCheck, ArrowLeft, ArrowRight, Package, Info, ChevronRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
 const Checkout = () => {
   const [step, setStep] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState('card');
-  const [shippingAddress, setShippingAddress] = useState({
-    address: '',
-    city: '',
-    postalCode: '',
-    country: 'India'
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const { cartItems, prices, clearCart } = useCart();
   const { userInfo } = useAuth();
+  const { cartItems, prices, clearCart } = useCart();
   const navigate = useNavigate();
 
-  const handleOrderSubmit = async (e) => {
+  const [shippingData, setShippingData] = useState({
+    name: '', address: '', pincode: '', city: '', contact: ''
+  });
+
+  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [createdOrder, setCreatedOrder] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const steps = [
+    { id: 1, name: 'Shipping Address', icon: Truck },
+    { id: 2, name: 'Payment Gateway', icon: CreditCard },
+    { id: 3, name: 'Order Confirmation', icon: CheckCircle2 }
+  ];
+
+  const handleShippingSubmit = (e) => {
     e.preventDefault();
-    if (step === 1) {
-      setStep(2);
-      return;
-    }
-    
-    setError('');
+    setStep(2);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
 
-    const orderData = {
-      orderItems: cartItems.map(item => ({
-        name: item.name,
-        quantity: item.quantity,
-        image: item.image,
-        price: item.price,
-        product: item._id
-      })),
-      shippingAddress,
-      paymentMethod,
-      itemsPrice: prices.itemsPrice,
-      taxPrice: prices.taxPrice,
-      shippingPrice: prices.shippingPrice,
-      totalPrice: prices.totalPrice
-    };
-
     try {
+      const token = userInfo?.token;
+
+      const orderData = {
+        orderItems: cartItems.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          image: item.image,
+          price: item.price,
+          product: item._id
+        })),
+        shippingAddress: {
+          address: shippingData.address,
+          city: shippingData.city,
+          postalCode: shippingData.pincode,
+          country: 'India'
+        },
+        paymentMethod: paymentMethod,
+        itemsPrice: prices.itemsPrice,
+        taxPrice: prices.taxPrice,
+        shippingPrice: prices.shippingPrice,
+        totalPrice: prices.totalPrice
+      };
+
       const res = await fetch('http://localhost:5001/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${userInfo.token}`
+          ...(token && { 'Authorization': `Bearer ${token}` })
         },
         body: JSON.stringify(orderData)
       });
 
+      const data = await res.json();
       if (res.ok) {
+        setCreatedOrder(data);
         clearCart();
         setStep(3);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        const data = await res.json();
-        setError(data.message || 'Order failed');
+        alert(data.message || 'Order failed');
       }
     } catch (err) {
-      setError('Connection error. Please try again.');
+      console.error('Order error:', err);
+      alert('Network error - check if backend is running');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="pt-24 min-h-screen container mx-auto px-6 pb-24">
-      {/* Progress Bar */}
-      <div className="max-w-3xl mx-auto mb-16 mt-8">
-        <div className="flex items-center justify-between relative">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-white/5 rounded-full -z-10"></div>
-          <div 
-            className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-gradient-to-r from-accent-blue to-accent-blue rounded-full -z-10 transition-all duration-500"
-            style={{ width: step === 1 ? '0%' : step === 2 ? '50%' : '100%' }}
-          ></div>
-          
-          <div className="flex flex-col items-center">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${step >= 1 ? 'bg-accent-blue text-dark-bg neon-glow' : 'glass-panel text-gray-500'}`}>1</div>
-            <span className={`text-xs mt-2 font-medium ${step >= 1 ? 'text-white' : 'text-gray-500'}`}>Shipping</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${step >= 2 ? 'bg-accent-blue text-dark-bg shadow-[0_0_15px_rgba(0,240,255,0.5)]' : 'glass-panel text-gray-500'}`}>2</div>
-            <span className={`text-xs mt-2 font-medium ${step >= 2 ? 'text-white' : 'text-gray-500'}`}>Payment</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${step >= 3 ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-dark-bg shadow-[0_0_15px_rgba(16,185,129,0.5)]' : 'glass-panel text-gray-500'}`}>3</div>
-            <span className={`text-xs mt-2 font-medium ${step >= 3 ? 'text-white' : 'text-gray-500'}`}>Confirmation</span>
-          </div>
+    <div className="pt-32 min-h-screen bg-white">
+      <div className="container mx-auto px-6 pb-24 max-w-6xl">
+        {/* Step Progress - Minimal Retail style */}
+        <div className="flex items-center justify-center gap-4 mb-20">
+          {steps.map((s, idx) => (
+            <React.Fragment key={s.id}>
+              <div className="flex flex-col items-center gap-3 relative">
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${step >= s.id ? 'bg-primary border-primary text-white' : 'bg-transparent border-border text-text-muted'}`}>
+                  <s.icon size={20} strokeWidth={2.5} />
+                </div>
+                <span className={`text-[10px] font-black uppercase tracking-widest absolute -bottom-8 whitespace-nowrap ${step >= s.id ? 'text-primary' : 'text-text-muted'}`}>{s.name}</span>
+              </div>
+              {idx < steps.length - 1 && (
+                <div className={`h-1 w-20 md:w-40 rounded-full bg-border relative overflow-hidden mb-8`}>
+                   <motion.div 
+                     initial={{ width: 0 }}
+                     animate={{ width: step > s.id ? '100%' : '0%' }}
+                     className="absolute inset-0 bg-primary"
+                   />
+                </div>
+              )}
+            </React.Fragment>
+          ))}
         </div>
-      </div>
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Main Content */}
-        <div className="lg:col-span-2">
-          <AnimatePresence mode="wait">
-            {step === 1 && (
-              <motion.div 
-                key="shipping"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="glass-panel p-8"
-              >
-                <div className="flex items-center mb-8 border-b border-glass-border pb-4">
-                  <Truck className="text-accent-blue mr-3" size={28} />
-                  <h2 className="text-2xl font-bold">Shipping Information</h2>
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start pt-10">
+          {/* Main Checkout Area */}
+          <div className="lg:col-span-7">
+            <AnimatePresence mode="wait">
+              {step === 1 && (
+                <motion.div key="step1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-12">
+                   <div className="flex items-center justify-between pb-6 border-b border-border">
+                      <h2 className="text-3xl font-black text-primary uppercase tracking-tighter italic">Delivery Details</h2>
+                      <p className="text-[10px] text-text-muted font-bold tracking-widest">STEP 01/03</p>
+                   </div>
 
-                <form className="space-y-6" onSubmit={handleOrderSubmit}>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="md:col-span-2">
-                       <label className="block text-sm font-medium text-gray-400 mb-2">Full Name</label>
-                       <input type="text" readOnly value={userInfo?.name || ''} className="w-full bg-dark-bg/30 border border-glass-border rounded-lg px-4 py-3 text-gray-500 cursor-not-allowed" />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Address</label>
-                    <input 
-                      type="text" 
-                      required 
-                      value={shippingAddress.address}
-                      onChange={(e) => setShippingAddress({...shippingAddress, address: e.target.value})}
-                      className="w-full bg-dark-bg border border-glass-border rounded-lg px-4 py-3 focus:outline-none focus:border-accent-blue" 
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">City</label>
-                      <input 
-                        type="text" 
-                        required 
-                        value={shippingAddress.city}
-                        onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
-                        className="w-full bg-dark-bg border border-glass-border rounded-lg px-4 py-3 focus:outline-none focus:border-accent-blue" 
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">ZIP Code</label>
-                      <input 
-                        type="text" 
-                        required 
-                        value={shippingAddress.postalCode}
-                        onChange={(e) => setShippingAddress({...shippingAddress, postalCode: e.target.value})}
-                        className="w-full bg-dark-bg border border-glass-border rounded-lg px-4 py-3 focus:outline-none focus:border-accent-blue" 
-                      />
-                    </div>
-                  </div>
-
-                  <button type="submit" className="w-full btn-primary py-4 mt-8 flex justify-center items-center group">
-                    Continue to Payment <ChevronRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                </form>
-              </motion.div>
-            )}
-
-            {step === 2 && (
-              <motion.div 
-                key="payment"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="glass-panel p-8 relative overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 w-64 h-64 bg-accent-blue/10 blur-[80px] rounded-full pointer-events-none"></div>
-
-                <div className="flex items-center mb-8 border-b border-glass-border pb-4">
-                  <Wallet className="text-accent-blue mr-3" size={28} />
-                  <h2 className="text-2xl font-bold">Payment Method</h2>
-                </div>
-
-                <div className="mb-8 p-4 bg-dark-bg border border-accent-blue/30 rounded-xl flex items-start space-x-4">
-                  <Lock className="text-accent-blue mt-1 shrink-0" size={20} />
-                  <p className="text-sm text-gray-300">
-                    Your payment information is encrypted and secure. We use industry-standard security protocols.
-                  </p>
-                </div>
-
-                {/* Payment Options Selector */}
-                <div className="grid grid-cols-3 gap-4 mb-8">
-                  <button 
-                    type="button" 
-                    onClick={() => setPaymentMethod('card')}
-                    className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all ${paymentMethod === 'card' ? 'border-accent-blue bg-accent-blue/10 text-white' : 'border-glass-border text-gray-400 hover:border-gray-500'}`}
-                  >
-                    <CreditCard size={24} className={`mb-2 ${paymentMethod === 'card' ? 'text-accent-blue' : ''}`} />
-                    <span className="text-sm font-bold">Credit/Debit Card</span>
-                  </button>
-                  <button 
-                    type="button" 
-                    onClick={() => setPaymentMethod('upi')}
-                    className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all ${paymentMethod === 'upi' ? 'border-accent-blue bg-accent-blue/10 text-white' : 'border-glass-border text-gray-400 hover:border-gray-500'}`}
-                  >
-                    <Smartphone size={24} className={`mb-2 ${paymentMethod === 'upi' ? 'text-accent-blue' : ''}`} />
-                    <span className="text-sm font-bold">UPI / Apps</span>
-                  </button>
-                  <button 
-                    type="button" 
-                    onClick={() => setPaymentMethod('cod')}
-                    className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all ${paymentMethod === 'cod' ? 'border-accent-blue bg-accent-blue/10 text-white' : 'border-glass-border text-gray-400 hover:border-gray-500'}`}
-                  >
-                    <Banknote size={24} className={`mb-2 ${paymentMethod === 'cod' ? 'text-accent-blue' : ''}`} />
-                    <span className="text-sm font-bold">Cash on Delivery</span>
-                  </button>
-                </div>
-
-                {error && (
-                  <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl text-red-500 text-sm text-center">
-                    {error}
-                  </div>
-                )}
-
-                <form className="space-y-6" onSubmit={handleOrderSubmit}>
-                  
-                  {/* Credit Card Form */}
-                  {paymentMethod === 'card' && (
-                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2">Card Number</label>
-                        <input type="text" required placeholder="0000 0000 0000 0000" className="w-full bg-dark-bg border border-glass-border rounded-lg px-4 py-3 focus:outline-none focus:border-accent-blue font-mono" />
-                      </div>
-                      
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        <div className="col-span-1 md:col-span-2">
-                          <label className="block text-sm font-medium text-gray-400 mb-2">Name on Card</label>
-                          <input type="text" required className="w-full bg-dark-bg border border-glass-border rounded-lg px-4 py-3 focus:outline-none focus:border-accent-blue" />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-400 mb-2">Expiry</label>
-                          <input type="text" required placeholder="12/26" className="w-full bg-dark-bg border border-glass-border rounded-lg px-4 py-3 focus:outline-none focus:border-accent-blue font-mono" />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-400 mb-2">CVC</label>
-                          <input type="password" required placeholder="123" className="w-full bg-dark-bg border border-glass-border rounded-lg px-4 py-3 focus:outline-none focus:border-accent-blue font-mono" />
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* UPI Form */}
-                  {paymentMethod === 'upi' && (
-                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-6">
-                      <div className="text-center p-6 border border-glass-border border-dashed rounded-xl bg-dark-bg/50">
-                        <div className="w-40 h-40 bg-white p-2 mx-auto mb-4 rounded-lg shadow-lg">
-                          <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=ecommerce@upi&am=${prices.totalPrice}&cu=INR`} alt="UPI QR Code" className="w-full h-full" />
-                        </div>
-                        <p className="text-sm tracking-wide text-gray-300">Scan QR Code using Google Pay, PhonePe, Paytm, or any UPI App</p>
-                      </div>
-                      
-                      <div className="flex items-center space-x-4">
-                        <div className="border-t border-glass-border flex-grow"></div>
-                        <span className="text-gray-500 font-bold uppercase text-xs">OR ENTER UPI ID</span>
-                        <div className="border-t border-glass-border flex-grow"></div>
-                      </div>
-
-                      <div>
-                        <input type="text" placeholder="example@upi" className="w-full bg-dark-bg border border-glass-border rounded-lg px-4 py-3 focus:outline-none focus:border-accent-blue" />
-                        <p className="text-xs text-gray-500 mt-2">We will send a payment request to this UPI ID.</p>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* Cash on Delivery Form */}
-                  {paymentMethod === 'cod' && (
-                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-6">
-                       <div className="p-6 border border-accent-blue/30 rounded-xl bg-accent-blue/5">
-                        <p className="text-gray-300 text-center text-lg font-medium">
-                          You have selected Cash on Delivery. 
-                        </p>
-                        <p className="text-center text-sm text-gray-400 mt-2">
-                          Please keep the exact amount ready at the time of delivery. A verification code will be sent to your phone.
-                        </p>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  <div className="flex space-x-4 mt-8 pt-6 border-t border-glass-border">
-                    <button type="button" onClick={() => setStep(1)} className="btn-outline w-1/3 py-4">Back</button>
-                    <button 
-                      type="submit" 
-                      disabled={loading}
-                      className="w-2/3 btn-primary py-4 flex justify-center items-center group disabled:opacity-50"
-                    >
-                      {loading ? 'Processing...' : (paymentMethod === 'cod' ? 'Confirm Order' : `Pay ₹${prices.totalPrice.toLocaleString()}`)} 
-                      {!loading && <CheckCircle2 className="ml-2 group-hover:scale-110 transition-transform" />}
-                    </button>
-                  </div>
-                </form>
-              </motion.div>
-            )}
-
-            {step === 3 && (
-              <motion.div 
-                key="success"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="glass-panel p-12 text-center relative overflow-hidden flex flex-col items-center"
-              >
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,240,255,0.1),transparent_70%)] pointer-events-none"></div>
-                
-                <motion.div 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1, rotate: [0, 10, 0] }}
-                  transition={{ type: "spring", stiffness: 200, damping: 10, delay: 0.2 }}
-                  className="w-24 h-24 rounded-full bg-gradient-to-tr from-accent-blue to-green-400 flex items-center justify-center mb-8 shadow-[0_0_30px_rgba(0,240,255,0.5)]"
-                >
-                  <CheckCircle2 size={48} className="text-dark-bg" />
+                   <form onSubmit={handleShippingSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                     <div className="md:col-span-2 space-y-2">
+                       <label className="text-xs font-black text-primary uppercase tracking-widest">Full Name</label>
+                       <input 
+                         required type="text" placeholder="John Doe" 
+                         className="input-field" 
+                         value={shippingData.name} onChange={(e) => setShippingData({...shippingData, name: e.target.value})}
+                       />
+                     </div>
+                     <div className="space-y-2">
+                       <label className="text-xs font-black text-primary uppercase tracking-widest">Contact Number</label>
+                       <input 
+                         required type="tel" placeholder="+91 00000 00000" 
+                         className="input-field"
+                         value={shippingData.contact} onChange={(e) => setShippingData({...shippingData, contact: e.target.value})}
+                       />
+                     </div>
+                     <div className="space-y-2">
+                       <label className="text-xs font-black text-primary uppercase tracking-widest">Pincode</label>
+                       <input 
+                         required type="text" placeholder="000 000" 
+                         className="input-field"
+                         value={shippingData.pincode} onChange={(e) => setShippingData({...shippingData, pincode: e.target.value})}
+                       />
+                     </div>
+                     <div className="md:col-span-2 space-y-2">
+                       <label className="text-xs font-black text-primary uppercase tracking-widest">Flat, House no., Building, Company, Apartment</label>
+                       <textarea 
+                         required placeholder="Enter full address" rows="3" 
+                         className="input-field !h-32 resize-none"
+                         value={shippingData.address} onChange={(e) => setShippingData({...shippingData, address: e.target.value})}
+                       ></textarea>
+                     </div>
+                     <div className="space-y-2">
+                        <label className="text-xs font-black text-primary uppercase tracking-widest">Town / City</label>
+                        <input 
+                          required type="text" placeholder="Bengaluru" 
+                          className="input-field"
+                          value={shippingData.city} onChange={(e) => setShippingData({...shippingData, city: e.target.value})}
+                        />
+                     </div>
+                     
+                     <div className="md:col-span-2 pt-10">
+                        <button type="submit" className="w-full btn-primary !rounded-sm !py-5 !tracking-[0.3em] shadow-xl shadow-accent/20 group">
+                           PROCEED TO PAYMENT <ArrowRight size={20} className="group-hover:translate-x-1" />
+                        </button>
+                     </div>
+                   </form>
                 </motion.div>
+              )}
 
-                <h2 className="text-4xl font-bold mb-4">Order Confirmed!</h2>
-                <p className="text-xl text-gray-300 mb-2">
-                  {paymentMethod === 'cod' ? 'Your order will be shipped soon.' : 'Thank you for your premium purchase.'}
-                </p>
-                <p className="text-gray-500 mb-8 font-mono border border-glass-border px-4 py-2 rounded-lg inline-block">Order #ORN-{Math.random().toString(36).substr(2, 9).toUpperCase()}</p>
+              {step === 2 && (
+                <motion.div key="step2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-12">
+                   <div className="flex items-center justify-between pb-6 border-b border-border">
+                      <h2 className="text-3xl font-black text-primary uppercase tracking-tighter italic">Secure Payment</h2>
+                      <p className="text-[10px] text-text-muted font-bold tracking-widest">STEP 02/03</p>
+                   </div>
 
-                <Link to="/" className="btn-primary inline-flex items-center px-8 py-3">
-                  Return to Home
-                </Link>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                   <div className="grid grid-cols-1 gap-6">
+                      {[
+                        { id: 'card', name: 'Credit / Debit Card', icon: CreditCard, desc: 'Visa, Mastercard, RuPay' },
+                        { id: 'upi', name: 'UPI (Popular choice)', icon: Smartphone, desc: 'Google Pay, PhonePe, Paytm' },
+                        { id: 'net', name: 'Net Banking', icon: Banknote, desc: 'All major Indian banks' },
+                        { id: 'cod', name: 'Cash on Delivery', icon: Truck, desc: 'Pay when your item arrives' }
+                      ].map(method => (
+                        <div 
+                          key={method.id} 
+                          onClick={() => setPaymentMethod(method.id)}
+                          className={`p-6 border-2 rounded-sm cursor-pointer transition-all flex items-center justify-between group ${paymentMethod === method.id ? 'border-accent bg-accent/5' : 'border-border hover:bg-slate-50'}`}
+                        >
+                           <div className="flex items-center gap-6">
+                              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${paymentMethod === method.id ? 'bg-accent text-white' : 'bg-slate-50 text-primary'}`}>
+                                 <method.icon size={22} strokeWidth={2.5} />
+                              </div>
+                              <div className="flex flex-col">
+                                 <span className="text-sm font-black text-primary uppercase tracking-widest">{method.name}</span>
+                                 <span className="text-[10px] font-bold text-text-muted">{method.desc}</span>
+                              </div>
+                           </div>
+                           <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${paymentMethod === method.id ? 'border-accent bg-accent' : 'border-border'}`}>
+                             {paymentMethod === method.id && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                           </div>
+                        </div>
+                      ))}
+                   </div>
+
+                   <div className="pt-10 flex flex-col sm:flex-row gap-6">
+                      <button onClick={() => setStep(1)} className="flex-1 btn-outline !rounded-sm !py-5 !tracking-[0.2em] font-black uppercase text-[11px] flex gap-2">
+                         <ArrowLeft size={16} /> GO BACK
+                      </button>
+                      <button 
+                        onClick={handlePaymentSubmit} 
+                        disabled={loading}
+                        className="flex-[2] btn-primary !rounded-sm !py-5 !tracking-[0.3em] font-black text-[12px] group italic shadow-xl shadow-accent/20 disabled:opacity-50"
+                      >
+                         {loading ? 'PROCESSING...' : 'CONFIRM & PAY NOW'} <ArrowRight size={20} className="group-hover:translate-x-1" />
+                      </button>
+                   </div>
+                </motion.div>
+              )}
+
+              {step === 3 && createdOrder && (
+                <motion.div key="step3" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center text-center py-10">
+                   <div className="w-24 h-24 rounded-full bg-success text-white flex items-center justify-center mb-10 shadow-xl shadow-success/20">
+                      <CheckCircle2 size={48} strokeWidth={3} />
+                   </div>
+                   <h2 className="text-4xl font-black text-primary uppercase tracking-tighter mb-4 italic leading-none">Order Successful!</h2>
+                   <p className="text-text-muted max-w-sm mb-12 text-sm font-medium leading-relaxed">Thank you for your retail trust. Your transaction ID <span className="font-bold text-accent">#{createdOrder._id.slice(-8).toUpperCase()}</span> has been confirmed.</p>
+                   
+                   {/* Real Order Detail Card */}
+                   <div className="w-full bg-slate-50 border border-border p-8 rounded-sm mb-12 text-left space-y-6">
+                      <div className="flex justify-between items-center pb-4 border-b border-border">
+                         <span className="text-[10px] font-black text-primary uppercase tracking-widest">Order Summary</span>
+                         <span className="text-[10px] font-black text-success uppercase tracking-widest">Total: ₹{createdOrder.totalPrice.toLocaleString()}</span>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        {createdOrder.orderItems.map((item, idx) => (
+                          <div key={idx} className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <img src={item.image} className="w-10 h-10 object-contain p-1 bg-white border border-border" alt={item.name} />
+                              <div className="flex flex-col">
+                                <span className="text-[11px] font-black text-primary uppercase tracking-tighter truncate max-w-[150px]">{item.name}</span>
+                                <span className="text-[9px] font-bold text-text-muted">QTY: {item.quantity}</span>
+                              </div>
+                            </div>
+                            <span className="text-xs font-black text-primary tracking-tighter">₹{(item.price * item.quantity).toLocaleString()}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="pt-6 border-t border-border space-y-3">
+                         <div className="flex justify-between items-center text-[9px] text-text-muted font-bold uppercase tracking-widest">
+                            <span>Expected Delivery</span>
+                            <span className="text-primary italic">Within 24-48 Hours</span>
+                         </div>
+                         <div className="flex justify-between items-center text-[9px] text-text-muted font-bold uppercase tracking-widest">
+                            <span>Ship To</span>
+                            <span className="text-primary italic">{createdOrder.shippingAddress.city}</span>
+                         </div>
+                      </div>
+                   </div>
+
+                   <Link to="/" className="btn-primary !px-16 !py-5 !tracking-[0.3em] !text-[12px] shadow-xl shadow-accent/20">
+                      RETURN TO HOME <ArrowRight size={20} className="ml-2" />
+                   </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Checkout Order Summary Area */}
+          <div className="lg:col-span-5 sticky top-32">
+             <div className="p-10 border border-border bg-slate-50 rounded-sm">
+                <div className="flex justify-between items-end mb-8 border-b border-border pb-6">
+                   <h2 className="text-[11px] font-black text-primary uppercase tracking-[0.3em]">Order Summary</h2>
+                   <span className="text-[10px] text-text-muted font-black border border-border px-2 py-0.5">{cartItems.length} ITEMS</span>
+                </div>
+
+                <div className="space-y-6 max-h-[350px] overflow-y-auto no-scrollbar pr-2 mb-10">
+                   {cartItems.map((item) => (
+                     <div key={item._id} className="flex gap-4 items-center">
+                        <div className="w-12 h-16 bg-white border border-border rounded-sm p-2 shrink-0">
+                           <img src={item.image} alt={item.name} className="w-full h-full object-contain mix-blend-multiply" />
+                        </div>
+                        <div className="flex-grow flex flex-col">
+                           <span className="text-xs font-black text-primary uppercase tracking-tighter truncate max-w-[200px]">{item.name}</span>
+                           <span className="text-[10px] font-bold text-text-muted">QTY: {item.quantity} · Flagship Model</span>
+                        </div>
+                        <span className="text-sm font-black text-primary tracking-tighter">₹{(item.price * item.quantity).toLocaleString()}</span>
+                     </div>
+                   ))}
+                </div>
+
+                <div className="space-y-4 pt-10 border-t border-border">
+                   <div className="flex justify-between items-center text-[10px] font-black text-text-muted uppercase tracking-widest">
+                      <span>Subtotal</span>
+                      <span className="text-primary">₹{prices.itemsPrice.toLocaleString()}</span>
+                   </div>
+                   <div className="flex justify-between items-center text-[10px] font-black text-text-muted uppercase tracking-widest">
+                      <span>GST (18%)</span>
+                      <span className="text-primary">₹{prices.taxPrice.toLocaleString()}</span>
+                   </div>
+                   <div className="flex justify-between items-center text-[10px] font-black text-success uppercase tracking-widest">
+                      <span>Shipping</span>
+                      <span className="rotate-3 italic border border-success px-2 font-black">LEGENDARY FREE</span>
+                   </div>
+                   <div className="flex justify-between items-center pt-8 border-t border-border mt-4">
+                      <span className="text-xs font-black text-primary uppercase tracking-[0.2em] italic underline decoration-4 decoration-accent/20">Grand Total</span>
+                      <span className="text-3xl font-black text-primary tracking-tighter leading-none" style={{ fontFamily: 'Inter' }}>₹{prices.totalPrice.toLocaleString()}</span>
+                   </div>
+                </div>
+
+                <div className="mt-12 flex flex-col gap-5 pt-10 border-t border-border">
+                   <div className="flex items-center gap-4 bg-white/50 p-4 border border-border rounded-sm">
+                      <ShieldCheck size={20} className="text-accent" />
+                      <div className="flex flex-col">
+                         <span className="text-[10px] font-black text-primary uppercase tracking-widest">Official Tech Retailer</span>
+                         <span className="text-[9px] text-text-muted font-medium italic">Verified by Global Electronic Hub</span>
+                      </div>
+                   </div>
+                   <div className="flex items-center gap-4 border border-border p-4 rounded-sm">
+                      <Lock size={20} className="text-text-muted" />
+                      <div className="flex flex-col">
+                         <span className="text-[10px] font-black text-primary uppercase tracking-widest">PCI-DSS COMPLIANT</span>
+                         <span className="text-[9px] text-text-muted font-medium italic">Encryption Level 256-bit active</span>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
         </div>
-
-        {/* Concise Order Summary Sidebar */}
-        {step < 3 && (
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="lg:col-span-1"
-          >
-            <div className="glass-panel p-6 sticky top-28 bg-dark-bg/80">
-              <h3 className="text-xl font-bold mb-6 border-b border-glass-border pb-4">In Your Bag</h3>
-              
-              <div className="space-y-4 mb-6 max-h-64 overflow-y-auto pr-2">
-                {cartItems.map((item) => (
-                  <div key={item._id} className="flex space-x-4">
-                    <div className="w-16 h-16 bg-white/5 rounded-lg p-1 shrink-0">
-                      <img src={item.image} className="w-full h-full object-contain" alt={item.name} />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-sm line-clamp-1">{item.name}</h4>
-                      <span className="text-xs text-gray-400 font-mono text-accent-blue">x{item.quantity}</span>
-                      <div className="font-mono text-sm mt-1">₹{item.price}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="border-t border-glass-border mb-4"></div>
-
-              <div className="flex justify-between items-center bg-white/5 p-4 rounded-xl border border-glass-border/50">
-                <span className="font-bold">Total Pay</span>
-                <span className="text-2xl font-black font-mono text-transparent bg-clip-text bg-gradient-to-r from-accent-blue to-white">₹{prices.totalPrice.toLocaleString()}</span>
-              </div>
-            </div>
-          </motion.div>
-        )}
       </div>
     </div>
   );

@@ -1,45 +1,136 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo, Suspense, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment, ContactShadows, useTexture, Plane, Float } from '@react-three/drei';
+import { OrbitControls, Environment, ContactShadows, useTexture, Plane, Float, Points, PointMaterial } from '@react-three/drei';
 import { useNavigate } from 'react-router-dom';
+import * as THREE from 'three';
+import { Sparkles, Box, Layout } from 'lucide-react';
 
-const ImageModel = ({ imageUrl, position, rotation, scale }) => {
-  const meshRef = useRef();
-  const texture = useTexture(imageUrl);
+// Error Boundary Fallback Component
+const HeroFallback = () => (
+  <div className="w-full h-full absolute inset-0 flex items-center justify-center bg-dark-bg overflow-hidden">
+    <div className="absolute inset-0 bg-gradient-to-tr from-accent-blue/10 via-transparent to-accent-purple/10 opacity-50"></div>
+    <div className="relative z-10 flex flex-col items-center gap-6 opacity-40">
+       <div className="relative">
+          <Box size={80} className="text-white animate-float" />
+          <div className="absolute inset-0 blur-2xl bg-accent-blue/20"></div>
+       </div>
+       <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/50">System Status: Active</p>
+    </div>
+  </div>
+);
+
+const GlowingParticles = ({ count = 500 }) => {
+  const points = useMemo(() => {
+    const p = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      p[i * 3] = (Math.random() - 0.5) * 15;
+      p[i * 3 + 1] = (Math.random() - 0.5) * 15;
+      p[i * 3 + 2] = (Math.random() - 0.5) * 15;
+    }
+    return p;
+  }, [count]);
+
+  const pointsRef = useRef();
 
   useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y = Math.sin(state.clock.getElapsedTime() * 0.5) * 0.1;
+    if (pointsRef.current) {
+      pointsRef.current.rotation.y = state.clock.getElapsedTime() * 0.05;
+      pointsRef.current.rotation.x = state.clock.getElapsedTime() * 0.02;
     }
   });
 
   return (
-    <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+    <Points ref={pointsRef} positions={points} stride={3}>
+      <PointMaterial
+        transparent
+        color="#00f0ff"
+        size={0.025}
+        sizeAttenuation={true}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </Points>
+  );
+};
+
+const ImageModel = ({ imageUrl, position, rotation, scale, colorHint = "#00f0ff" }) => {
+  const meshRef = useRef();
+  const [hasError, setHasError] = useState(false);
+  
+  // Custom loader with error handling
+  let texture = null;
+  try {
+    texture = useTexture(imageUrl);
+  } catch (e) {
+    if (!hasError) setHasError(true);
+  }
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y = Math.sin(state.clock.getElapsedTime() * 0.5) * 0.15;
+      meshRef.current.rotation.z = Math.cos(state.clock.getElapsedTime() * 0.3) * 0.05;
+    }
+  });
+
+  return (
+    <Float speed={3} rotationIntensity={0.8} floatIntensity={1}>
       <group position={position} rotation={rotation} scale={scale} ref={meshRef}>
         <Plane args={[3, 3]}>
-          <meshStandardMaterial 
-            map={texture} 
-            transparent={true} 
-            alphaTest={0.1}
-            side={2}
-          />
+          {texture && !hasError ? (
+            <meshStandardMaterial 
+              map={texture} 
+              transparent={true} 
+              alphaTest={0.5}
+              side={THREE.DoubleSide}
+              emissive={colorHint}
+              emissiveIntensity={0.4}
+              onBeforeCompile={(shader) => {
+                shader.fragmentShader = shader.fragmentShader.replace(
+                  '#include <map_fragment>',
+                  `
+                  #include <map_fragment>
+                  // If the color is very bright (white background), discard it
+                  if (diffuseColor.r > 0.92 && diffuseColor.g > 0.92 && diffuseColor.b > 0.92) {
+                    discard;
+                  }
+                  `
+                );
+              }}
+            />
+          ) : (
+            <meshStandardMaterial 
+              color={colorHint}
+              transparent={true}
+              opacity={0.1}
+              wireframe
+              side={THREE.DoubleSide}
+            />
+          )}
         </Plane>
+        {/* Glow Ring */}
+        <mesh position={[0, 0, -0.1]}>
+           <ringGeometry args={[1.4, 1.45, 64]} />
+           <meshBasicMaterial color={colorHint} transparent opacity={0.2} />
+        </mesh>
       </group>
     </Float>
   );
 };
 
 const Scene = ({ onProductClick }) => {
-  const handlePointerOver = () => document.body.style.cursor = 'pointer';
-  const handlePointerOut = () => document.body.style.cursor = 'auto';
+  const handlePointerOver = () => { if(typeof document !== 'undefined') document.body.style.cursor = 'pointer'; };
+  const handlePointerOut = () => { if(typeof document !== 'undefined') document.body.style.cursor = 'auto'; };
 
   return (
     <>
-      <ambientLight intensity={1.5} />
-      <directionalLight position={[10, 10, 5]} intensity={2.5} />
-      <directionalLight position={[-10, -10, -5]} intensity={1.5} color="#00f0ff" />
+      <ambientLight intensity={0.5} />
+      <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={2} color="#ffffff" castShadow />
+      <pointLight position={[-10, -10, -10]} intensity={1} color="#00f0ff" />
+      <pointLight position={[10, -10, 10]} intensity={1} color="#ff00e5" />
       
-      {/* Headphones Model (Left-ish) */}
+      <GlowingParticles count={800} />
+
+      {/* Headphones Module */}
       <group 
         onClick={() => onProductClick('headphones')}
         onPointerOver={handlePointerOver}
@@ -47,13 +138,14 @@ const Scene = ({ onProductClick }) => {
       >
         <ImageModel 
           imageUrl="/images/products/headphones.png"
-          position={[-2.5, 1.2, -1]}
-          rotation={[0, 0.3, 0]}
-          scale={1.3}
+          position={[-3, 1, -1]}
+          rotation={[0, 0.4, 0]}
+          scale={1.4}
+          colorHint="#00f0ff"
         />
       </group>
 
-      {/* iPhone Model (Right-ish) */}
+      {/* Flagship Device Module */}
       <group 
         onClick={() => onProductClick('iphone')}
         onPointerOver={handlePointerOver}
@@ -61,56 +153,65 @@ const Scene = ({ onProductClick }) => {
       >
         <ImageModel 
           imageUrl="/images/products/iphone.png"
-          position={[2.5, -1.2, 1]}
-          rotation={[0, -0.3, 0]}
-          scale={1.6}
+          position={[3, -1, 1]}
+          rotation={[0, -0.4, 0]}
+          scale={1.8}
+          colorHint="#ff00e5"
         />
       </group>
 
-      <Environment preset="city" />
-      <ContactShadows position={[1.5, -3, 0]} opacity={0.4} scale={20} blur={2} far={5} color="#00f0ff" />
+      <Suspense fallback={null}>
+        <Environment preset="night" />
+      </Suspense>
     </>
   );
 };
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() {
+    if (this.state.hasError) return <HeroFallback />;
+    return this.props.children;
+  }
+}
+
 const Hero3D = () => {
   const navigate = useNavigate();
-  // We'll need to fetch these or hardcode for now if we want instant fix
-  // based on our seeder, we can get them dynamically in a real app
-  // for this fix, we'll use a dynamic lookup or specific route
 
   const handleProductClick = async (type) => {
-    document.body.style.cursor = 'auto';
+    if(typeof document !== 'undefined') document.body.style.cursor = 'auto';
     try {
-      // Fetch products to find the right ID
       const res = await fetch('http://localhost:5001/api/products');
       const products = await res.json();
-      
-      const targetName = type === 'iphone' ? 'iPhone 15 Pro' : 'Sony WH-1000XM5';
-      const target = products.find(p => p.name === targetName);
-      
-      if (target) {
-        navigate(`/product/${target._id}`);
-      } else {
-        navigate('/products');
-      }
+      const target = products.find(p => p.name.includes(type === 'iphone' ? 'iPhone' : 'Sony'));
+      if (target) navigate(`/product/${target._id}`);
+      else navigate('/products');
     } catch (err) {
       navigate('/products');
     }
   };
 
   return (
-    <div className="w-full h-full absolute inset-0 mix-blend-screen overflow-visible">
-      <Canvas camera={{ position: [0, 0, 8], fov: 45 }} className="block w-full h-full">
-        <Scene onProductClick={handleProductClick} />
-        <OrbitControls 
-          enableZoom={false} 
-          enablePan={false} 
-          autoRotate={false}
-          maxPolarAngle={Math.PI / 2 + 0.2}
-          minPolarAngle={Math.PI / 2 - 0.5}
-        />
-      </Canvas>
+    <div className="w-full h-full absolute inset-0 mix-blend-screen overflow-visible select-none pointer-events-auto">
+      <ErrorBoundary>
+        <Canvas camera={{ position: [0, 0, 10], fov: 40 }} dpr={[1, 2]} gl={{ antialias: true, alpha: true }}>
+          <Suspense fallback={null}>
+            <Scene onProductClick={handleProductClick} />
+          </Suspense>
+          <OrbitControls 
+            enableZoom={false} 
+            enablePan={false} 
+            autoRotate={true}
+            autoRotateSpeed={0.5}
+            maxPolarAngle={Math.PI / 2 + 0.3}
+            minPolarAngle={Math.PI / 2 - 0.3}
+          />
+        </Canvas>
+      </ErrorBoundary>
     </div>
   );
 };
