@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Heart, Search, User, Menu, X, Settings, LogOut, LayoutDashboard, ChevronDown, Mic, MicOff, Moon, Sun, LayoutPanelLeft } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ShoppingCart, Heart, Search, User, Menu, X, Settings, LogOut, LayoutDashboard, ChevronDown, Moon, Sun, LayoutPanelLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -11,7 +11,9 @@ import { useCompare } from '../context/CompareContext';
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [keyword, setKeyword] = useState('');
-  const [isListening, setIsListening] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [allProducts, setAllProducts] = useState([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { userInfo, logout } = useAuth();
   const { cartItems } = useCart();
@@ -20,6 +22,7 @@ const Navbar = () => {
   const { compareItems } = useCompare();
   const navigate = useNavigate();
   const location = useLocation();
+  const searchRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 1);
@@ -27,38 +30,65 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const fetchAllProducts = async () => {
+      try {
+        const res = await fetch('http://localhost:5001/api/products');
+        const data = await res.json();
+        setAllProducts(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Error fetching products search suggestions:', err);
+        setAllProducts([]);
+      }
+    };
+    fetchAllProducts();
+  }, []);
+
+  useEffect(() => {
+    if (keyword.trim() && Array.isArray(allProducts)) {
+      try {
+        const searchLow = keyword.toLowerCase();
+        const filtered = allProducts.filter(p => {
+          if (!p) return false;
+          return (p.name?.toLowerCase().includes(searchLow)) ||
+                 (p.category?.toLowerCase().includes(searchLow)) ||
+                 (p.brand?.toLowerCase().includes(searchLow));
+        }).slice(0, 8);
+        setSuggestions(filtered);
+        setShowSuggestions(true);
+      } catch (err) {
+        console.error('Search error:', err);
+        setSuggestions([]);
+      }
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [keyword, allProducts]);
+
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const startVoiceSearch = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("Voice search is not supported in this browser.");
-      return;
-    }
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.interimResults = false;
-
-    recognition.onstart = () => setIsListening(true);
-    recognition.onend = () => setIsListening(false);
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setKeyword(transcript);
-      navigate(`/products?search=${transcript}`);
-    };
-
-    recognition.start();
-  };
 
   const submitHandler = (e) => {
     e.preventDefault();
     if (keyword.trim()) {
       navigate(`/products?search=${keyword}`);
       setKeyword('');
+      setShowSuggestions(false);
     }
   };
 
@@ -95,26 +125,70 @@ const Navbar = () => {
           ))}
         </div>
 
-        {/* Global Search with Voice */}
-        <div className="grow max-w-2xl mx-12 hidden md:block">
-          <form onSubmit={submitHandler} className="relative">
+        {/* Global Search - Enhanced Layout */}
+        <div className="flex-1 max-w-2xl mx-12 hidden md:block min-w-[300px]">
+          <form ref={searchRef} onSubmit={submitHandler} className="relative w-full">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">
               <Search size={18} strokeWidth={2.5} />
             </div>
             <input 
               type="text" 
-              placeholder="Search for products, brands and more"
+              placeholder="Search for premium tech products..."
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
-              className={`w-full border-0 rounded-md pl-12 pr-12 py-3 text-sm focus:ring-1 outline-none transition-all placeholder:text-text-muted font-medium ${darkMode ? 'bg-slate-900 focus:bg-slate-800 text-white focus:ring-slate-700' : 'bg-bg-alt focus:bg-white focus:ring-border'}`}
+              onFocus={() => keyword.trim() && setShowSuggestions(true)}
+              className={`w-full border-0 rounded-md pl-12 pr-6 py-3 text-sm focus:ring-1 outline-none transition-all placeholder:text-text-muted font-medium ${darkMode ? 'bg-slate-900 focus:bg-slate-800 text-white focus:ring-slate-700' : 'bg-bg-alt focus:bg-white focus:ring-border'}`}
             />
-            <button 
-              type="button" 
-              onClick={startVoiceSearch}
-              className={`absolute right-4 top-1/2 -translate-y-1/2 transition-all ${isListening ? 'text-accent animate-pulse' : 'text-text-muted hover:text-primary'}`}
-            >
-              {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-            </button>
+            
+            <AnimatePresence>
+              {showSuggestions && Array.isArray(suggestions) && suggestions.length > 0 && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className={`absolute left-0 right-0 top-full mt-2 rounded-sm shadow-2xl border z-[110] overflow-hidden backdrop-blur-xl ${darkMode ? 'bg-slate-950/95 border-slate-800 shadow-black/80' : 'bg-white/95 border-border shadow-gray-200'}`}
+                >
+                  <div className={`px-4 py-2 border-b text-[9px] font-black uppercase tracking-widest ${darkMode ? 'border-slate-800 text-slate-500' : 'border-border text-text-muted'}`}>
+                    Found in collection
+                  </div>
+                  <div className="max-h-[60vh] overflow-y-auto no-scrollbar">
+                    {suggestions.map((p) => {
+                      if (!p || !p._id) return null;
+                      return (
+                        <button
+                          key={p._id}
+                          type="button"
+                          onClick={() => {
+                            navigate(`/product/${p._id}`);
+                            setShowSuggestions(false);
+                            setKeyword('');
+                          }}
+                          className={`w-full flex items-center gap-4 px-4 py-4 text-left transition-colors border-b last:border-0 ${darkMode ? 'hover:bg-slate-900 border-slate-900/50' : 'hover:bg-slate-50 border-border/50'}`}
+                        >
+                          <div className="w-12 h-12 bg-white rounded-sm overflow-hidden p-1 shrink-0 shadow-sm">
+                            <img src={p.image || '/images/sample.jpg'} alt={p.name} className="w-full h-full object-contain" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-xs font-black truncate uppercase tracking-tight ${darkMode ? 'text-white' : 'text-primary'}`}>{p.name || 'Product'}</p>
+                            <div className="flex items-center gap-3 mt-1">
+                              <span className="text-accent text-[11px] font-black">₹{typeof p.price === 'number' ? p.price.toLocaleString() : '0'}</span>
+                              <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-sm ${darkMode ? 'bg-slate-900 text-slate-500' : 'bg-bg-alt text-text-muted'}`}>{p.category}</span>
+                            </div>
+                          </div>
+                          <ChevronRight size={14} className={darkMode ? 'text-slate-700' : 'text-slate-300'} />
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <button
+                    type="submit"
+                    className={`w-full py-3.5 text-center text-[10px] font-black uppercase tracking-widest transition-all ${darkMode ? 'bg-slate-900 text-accent hover:bg-black' : 'bg-bg-alt text-accent hover:bg-white'}`}
+                  >
+                    Explore results for "{keyword}"
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </form>
         </div>
 
